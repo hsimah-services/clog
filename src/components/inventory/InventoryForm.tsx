@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { CloseButton } from '@/components/ui/CloseButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -11,13 +12,14 @@ import type { Inventory } from '@/types';
 
 interface InventoryFormProps {
   inventory?: Inventory;
+  onClose?: () => void;
 }
 
 function toDateInputValue(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-export function InventoryForm({ inventory }: InventoryFormProps) {
+export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
   const navigate = useNavigate();
   const { items, locations, addInventory, updateInventory, getItem } = useData();
   const [itemId, setItemId] = useState(inventory?.itemId ?? '');
@@ -60,8 +62,9 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader >
         <CardTitle>{isEditing ? 'Edit Inventory' : 'New Inventory Entry'}</CardTitle>
+        {onClose && <CloseButton onClose={onClose} />}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

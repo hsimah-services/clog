@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { useData } from '@/context/DataContext';
 import { calcExpiryDate } from '@/lib/utils';
+import type { Inventory } from '@/types';
 
 interface GroupEntry {
   itemId: string;
@@ -158,6 +159,8 @@ export function InventoryList() {
                       deleteInventory(entry.inventoryIds[entry.inventoryIds.length - 1]);
                     }
                   }}
+                  inventoryRecords={inventory.filter((inv) => inv.itemId === group.itemId)}
+                  onDeleteRecord={deleteInventory}
                 />
               );
             })
@@ -174,14 +177,31 @@ function InventoryGroupRow({
   onToggle,
   onIncrement,
   onDecrement,
+  inventoryRecords,
+  onDeleteRecord,
 }: {
   group: ItemGroup;
   isExpanded: boolean;
   onToggle: () => void;
   onIncrement: (entry: GroupEntry) => void;
   onDecrement: (entry: GroupEntry) => void;
+  inventoryRecords: Inventory[];
+  onDeleteRecord: (id: string) => void;
 }) {
+  const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
   const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
+
+  function toggleLocation(locationId: string) {
+    setExpandedLocations((prev) => {
+      const next = new Set(prev);
+      if (next.has(locationId)) {
+        next.delete(locationId);
+      } else {
+        next.add(locationId);
+      }
+      return next;
+    });
+  }
 
   return (
     <>
@@ -219,54 +239,124 @@ function InventoryGroupRow({
         <TableCell />
       </TableRow>
       {isExpanded &&
-        group.entries.map((entry) => (
-          <TableRow key={entry.locationId} className="bg-muted/50">
+        group.entries.map((entry) => {
+          const isLocationExpanded = expandedLocations.has(entry.locationId);
+          return (
+            <LocationEntryRows
+              key={entry.locationId}
+              entry={entry}
+              isLocationExpanded={isLocationExpanded}
+              onToggleLocation={() => toggleLocation(entry.locationId)}
+              onIncrement={onIncrement}
+              onDecrement={onDecrement}
+              inventoryRecords={inventoryRecords.filter((r) => r.locationId === entry.locationId)}
+              onDeleteRecord={onDeleteRecord}
+            />
+          );
+        })}
+    </>
+  );
+}
+
+function LocationEntryRows({
+  entry,
+  isLocationExpanded,
+  onToggleLocation,
+  onIncrement,
+  onDecrement,
+  inventoryRecords,
+  onDeleteRecord,
+}: {
+  entry: GroupEntry;
+  isLocationExpanded: boolean;
+  onToggleLocation: () => void;
+  onIncrement: (entry: GroupEntry) => void;
+  onDecrement: (entry: GroupEntry) => void;
+  inventoryRecords: Inventory[];
+  onDeleteRecord: (id: string) => void;
+}) {
+  const LocationChevron = isLocationExpanded ? ChevronDown : ChevronRight;
+
+  return (
+    <>
+      <TableRow className="bg-muted/50 cursor-pointer" onClick={onToggleLocation}>
+        <TableCell>
+          <LocationChevron className="h-3 w-3 ml-2" />
+        </TableCell>
+        <TableCell />
+        <TableCell className="pl-8">
+          <Link
+            to={`/locations/${entry.locationId}`}
+            className="text-primary hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {entry.locationName}
+          </Link>
+        </TableCell>
+        <TableCell>{entry.count}</TableCell>
+        <TableCell>{entry.closestExpiry?.toLocaleDateString() ?? 'No expiry'}</TableCell>
+        <TableCell>
+          <div className="flex items-center gap-0">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 rounded-r-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDecrement(entry);
+              }}
+              disabled={entry.count === 0}
+            >
+              <Minus className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 rounded-l-none border-l-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                onIncrement(entry);
+              }}
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+      {isLocationExpanded &&
+        inventoryRecords.map((inv) => (
+          <TableRow key={inv.id} className="bg-muted/30">
             <TableCell />
             <TableCell />
-            <TableCell className="pl-8">
-              <Link
-                to={`/locations/${entry.locationId}`}
-                className="text-primary hover:underline"
-              >
-                {entry.locationName}
-              </Link>
+            <TableCell className="pl-12 text-sm text-muted-foreground">
+              Added {inv.dateAdded.toLocaleDateString()}
             </TableCell>
-            <TableCell>{entry.count}</TableCell>
-            <TableCell>{entry.closestExpiry?.toLocaleDateString() ?? 'No expiry'}</TableCell>
+            <TableCell />
+            <TableCell className="text-sm">
+              {inv.dateExpiry?.toLocaleDateString() ?? 'No expiry'}
+            </TableCell>
             <TableCell>
               <div className="flex items-center gap-0">
                 <Button
                   variant="outline"
                   size="icon"
                   className="h-7 w-7 rounded-r-none"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDecrement(entry);
-                  }}
-                  disabled={entry.count === 0}
+                  asChild
                 >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 rounded-none border-l-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onIncrement(entry);
-                  }}
-                >
-                  <Plus className="h-3 w-3" />
+                  <Link to={`/inventory/${inv.id}`} onClick={(e) => e.stopPropagation()}>
+                    <Info className="h-3 w-3" />
+                  </Link>
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
                   className="h-7 w-7 rounded-l-none border-l-0"
-                  asChild
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteRecord(inv.id);
+                  }}
                 >
-                  <Link to={`/inventory/${entry.inventoryIds[0]}`} onClick={(e) => e.stopPropagation()}>
-                    <Info className="h-3 w-3" />
-                  </Link>
+                  <Minus className="h-3 w-3" />
                 </Button>
               </div>
             </TableCell>

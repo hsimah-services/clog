@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { CloseButton } from '@/components/ui/CloseButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
 import type { Inventory } from '@/types';
@@ -11,7 +12,7 @@ interface InventoryDetailsProps {
 export function InventoryDetails({ inventory }: InventoryDetailsProps) {
   const navigate = useNavigate();
   const { getItem, getLocation, deleteInventory } = useData();
-
+  const { onClose } = useOutletContext<{ onClose?: () => void }>();
   const item = getItem(inventory.itemId);
   const location = getLocation(inventory.locationId);
 
@@ -22,8 +23,9 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader >
         <CardTitle>Inventory Entry</CardTitle>
+        {onClose && <CloseButton onClose={onClose} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>

@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
 import type { Location } from '@/types';
+import { CloseButton } from '../ui/CloseButton';
 
 interface LocationDetailsProps {
   location: Location;
@@ -12,6 +13,7 @@ export function LocationDetails({ location }: LocationDetailsProps) {
   const navigate = useNavigate();
   const { deleteLocation } = useData();
 
+  const { onClose } = useOutletContext<{ onClose?: () => void }>();
   const handleDelete = () => {
     deleteLocation(location.id);
     navigate('/locations');
@@ -21,6 +23,7 @@ export function LocationDetails({ location }: LocationDetailsProps) {
     <Card>
       <CardHeader>
         <CardTitle>{location.name}</CardTitle>
+        {onClose && <CloseButton onClose={onClose} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>

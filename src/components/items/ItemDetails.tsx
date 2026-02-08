@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { CloseButton } from '@/components/ui/CloseButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
 import type { Item } from '@/types';
@@ -8,9 +9,10 @@ interface ItemDetailsProps {
   item: Item;
 }
 
-export function ItemDetails({ item }: ItemDetailsProps) {
+export function ItemDetails({ item,  }: ItemDetailsProps) {
   const navigate = useNavigate();
   const { deleteItem } = useData();
+  const { onClose } = useOutletContext<{ onClose?: () => void }>();
 
   const handleDelete = () => {
     deleteItem(item.id);
@@ -21,11 +23,12 @@ export function ItemDetails({ item }: ItemDetailsProps) {
     <Card>
       <CardHeader>
         <CardTitle>{item.name}</CardTitle>
+        {onClose && <CloseButton onClose={onClose} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <p className="text-sm text-muted-foreground">Barcode</p>
-          <p className="font-mono">{item.barcode}</p>
+          <p className="font-mono">{item.barcodes}</p>
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Default Expiry</p>

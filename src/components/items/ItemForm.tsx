@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
-import type { Item } from '@/types';
+import { calcExpiryDate } from '@/lib/utils';
+import type { Item, DefaultExpiry } from '@/types';
 
 interface ItemFormProps {
   item?: Item;
@@ -18,6 +19,8 @@ export function ItemForm({ item }: ItemFormProps) {
   const { addItem, updateItem, locations, addInventory } = useData();
   const [name, setName] = useState(item?.name ?? '');
   const [barcodes, setBarcodes] = useState<string[]>([...(item?.barcodes ?? []), '']);
+  const [expiryValue, setExpiryValue] = useState(item?.defaultExpiry?.value.toString() ?? '');
+  const [expiryUnit, setExpiryUnit] = useState<'days' | 'months'>(item?.defaultExpiry?.unit ?? 'days');
   const [locationId, setLocationId] = useState('');
   const [count, setCount] = useState('');
 
@@ -43,15 +46,20 @@ export function ItemForm({ item }: ItemFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const filteredBarcodes = barcodes.filter((b) => b.trim() !== '');
+    const parsedExpiry = parseInt(expiryValue, 10);
+    const defaultExpiry: DefaultExpiry | null = parsedExpiry > 0
+      ? { unit: expiryUnit, value: parsedExpiry }
+      : null;
     if (item) {
-      updateItem(item.id, { name, barcodes: filteredBarcodes });
+      updateItem(item.id, { name, barcodes: filteredBarcodes, defaultExpiry });
       navigate(`/items/${item.id}`);
     } else {
-      const newItem = addItem({ name, barcodes: filteredBarcodes });
+      const newItem = addItem({ name, barcodes: filteredBarcodes, defaultExpiry });
       if (locationId) {
         const itemCount = parseInt(count, 10) || 0;
+        const dateExpiry = defaultExpiry ? calcExpiryDate(defaultExpiry) : null;
         for (let i = 0; i < itemCount; i++) {
-          addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry: null });
+          addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry });
         }
       }
       navigate(`/items/${newItem.id}`);
@@ -95,6 +103,27 @@ export function ItemForm({ item }: ItemFormProps) {
                 </Button>
               </div>
             ))}
+          </div>
+          <div className="space-y-2">
+            <Label>Default Expiry (optional)</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min="0"
+                value={expiryValue}
+                onChange={(e) => setExpiryValue(e.target.value)}
+                placeholder="e.g. 6"
+                className="max-w-[120px]"
+              />
+              <Select
+                value={expiryUnit}
+                onChange={(e) => setExpiryUnit(e.target.value as 'days' | 'months')}
+                className="max-w-[120px]"
+              >
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+              </Select>
+            </div>
           </div>
           {!item && (
             <>

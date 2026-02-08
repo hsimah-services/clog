@@ -25,7 +25,11 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Item[]>(
-    seedData.items.map((i) => ({ ...i, createdAt: new Date(i.createdAt) }))
+    seedData.items.map((i) => ({
+      ...i,
+      defaultExpiry: i.defaultExpiry as Item['defaultExpiry'],
+      createdAt: new Date(i.createdAt),
+    }))
   );
   const [locations, setLocations] = useState<Location[]>(
     seedData.locations.map((l) => ({ ...l, createdAt: new Date(l.createdAt) }))

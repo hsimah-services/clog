@@ -8,3 +8,13 @@ export function cn(...inputs: ClassValue[]) {
 export function generateId(): string {
   return crypto.randomUUID();
 }
+
+export function calcExpiryDate(defaultExpiry: { unit: 'days' | 'months'; value: number }, from: Date = new Date()): Date {
+  const result = new Date(from);
+  if (defaultExpiry.unit === 'days') {
+    result.setDate(result.getDate() + defaultExpiry.value);
+  } else {
+    result.setMonth(result.getMonth() + defaultExpiry.value);
+  }
+  return result;
+}

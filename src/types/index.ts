@@ -1,7 +1,13 @@
+export interface DefaultExpiry {
+  unit: 'days' | 'months';
+  value: number;
+}
+
 export interface Item {
   id: string;
   name: string;
   barcodes: string[];
+  defaultExpiry: DefaultExpiry | null;
   createdAt: Date;
 }
 

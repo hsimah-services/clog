@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useData } from '@/context/DataContext';
+import { calcExpiryDate } from '@/lib/utils';
 
 interface GroupEntry {
   itemId: string;
@@ -19,6 +20,7 @@ interface GroupEntry {
   locationId: string;
   locationName: string;
   count: number;
+  closestExpiry: Date | null;
 }
 
 interface ItemGroup {
@@ -26,6 +28,12 @@ interface ItemGroup {
   itemName: string;
   entries: GroupEntry[];
   totalCount: number;
+}
+
+function earlierExpiry(a: Date | null, b: Date | null): Date | null {
+  if (!a) return b;
+  if (!b) return a;
+  return a < b ? a : b;
 }
 
 export function InventoryList() {
@@ -43,6 +51,7 @@ export function InventoryList() {
       if (existingEntry) {
         existingEntry.inventoryIds.push(inv.id);
         existingEntry.count += 1;
+        existingEntry.closestExpiry = earlierExpiry(existingEntry.closestExpiry, inv.dateExpiry);
       } else {
         existing.entries.push({
           itemId: inv.itemId,
@@ -50,6 +59,7 @@ export function InventoryList() {
           locationId: inv.locationId,
           locationName: location?.name ?? 'Unknown',
           count: 1,
+          closestExpiry: inv.dateExpiry,
         });
       }
       existing.totalCount += 1;
@@ -64,6 +74,7 @@ export function InventoryList() {
             locationId: inv.locationId,
             locationName: location?.name ?? 'Unknown',
             count: 1,
+            closestExpiry: inv.dateExpiry,
           },
         ],
         totalCount: 1,
@@ -110,13 +121,14 @@ export function InventoryList() {
             <TableHead>Item</TableHead>
             <TableHead>Locations</TableHead>
             <TableHead>Total Count</TableHead>
+            <TableHead>Closest Expiry</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredGroups.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
                 No inventory entries found
               </TableCell>
             </TableRow>
@@ -130,11 +142,15 @@ export function InventoryList() {
                   isExpanded={isExpanded}
                   onToggle={() => toggleExpand(group.itemId)}
                   onIncrement={(entry) => {
+                    const item = getItem(entry.itemId);
+                    const dateExpiry = item?.defaultExpiry
+                      ? calcExpiryDate(item.defaultExpiry)
+                      : null;
                     addInventory({
                       itemId: entry.itemId,
                       locationId: entry.locationId,
                       dateAdded: new Date(),
-                      dateExpiry: null,
+                      dateExpiry,
                     });
                   }}
                   onDecrement={(entry) => {
@@ -197,6 +213,9 @@ function InventoryGroupRow({
           ))}
         </TableCell>
         <TableCell>{group.totalCount}</TableCell>
+        <TableCell>
+          {group.entries.reduce<Date | null>((min, e) => earlierExpiry(min, e.closestExpiry), null)?.toLocaleDateString() ?? 'No expiry'}
+        </TableCell>
         <TableCell />
       </TableRow>
       {isExpanded &&
@@ -213,6 +232,7 @@ function InventoryGroupRow({
               </Link>
             </TableCell>
             <TableCell>{entry.count}</TableCell>
+            <TableCell>{entry.closestExpiry?.toLocaleDateString() ?? 'No expiry'}</TableCell>
             <TableCell>
               <div className="flex items-center gap-0">
                 <Button

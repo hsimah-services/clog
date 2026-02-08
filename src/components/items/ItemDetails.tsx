@@ -28,6 +28,10 @@ export function ItemDetails({ item }: ItemDetailsProps) {
           <p className="font-mono">{item.barcode}</p>
         </div>
         <div>
+          <p className="text-sm text-muted-foreground">Default Expiry</p>
+          <p>{item.defaultExpiry ? `${item.defaultExpiry.value} ${item.defaultExpiry.unit}` : 'None'}</p>
+        </div>
+        <div>
           <p className="text-sm text-muted-foreground">Created</p>
           <p>{item.createdAt.toLocaleDateString()}</p>
         </div>

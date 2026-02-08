@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
+import { calcExpiryDate } from '@/lib/utils';
 import type { Inventory } from '@/types';
 
 interface InventoryFormProps {
@@ -18,13 +19,23 @@ function toDateInputValue(date: Date): string {
 
 export function InventoryForm({ inventory }: InventoryFormProps) {
   const navigate = useNavigate();
-  const { items, locations, addInventory, updateInventory } = useData();
+  const { items, locations, addInventory, updateInventory, getItem } = useData();
   const [itemId, setItemId] = useState(inventory?.itemId ?? '');
   const [locationId, setLocationId] = useState(inventory?.locationId ?? '');
   const [dateAdded] = useState(toDateInputValue(inventory?.dateAdded ?? new Date()));
   const [dateExpiry, setDateExpiry] = useState(
     inventory?.dateExpiry ? toDateInputValue(inventory.dateExpiry) : ''
   );
+
+  const handleItemChange = (newItemId: string) => {
+    setItemId(newItemId);
+    const item = getItem(newItemId);
+    if (item?.defaultExpiry) {
+      setDateExpiry(toDateInputValue(calcExpiryDate(item.defaultExpiry)));
+    } else {
+      setDateExpiry('');
+    }
+  };
 
   const isEditing = !!inventory;
 
@@ -59,7 +70,7 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
             <Select
               id="item"
               value={itemId}
-              onChange={(e) => setItemId(e.target.value)}
+              onChange={(e) => handleItemChange(e.target.value)}
               required
               disabled={isEditing}
             >

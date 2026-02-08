@@ -5,7 +5,7 @@ import { CloseButton } from '@/components/ui/CloseButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
 import { calcExpiryDate } from '@/lib/utils';
 import type { Inventory } from '@/types';

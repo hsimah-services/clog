@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,17 +17,37 @@ export function ItemForm({ item }: ItemFormProps) {
   const navigate = useNavigate();
   const { addItem, updateItem, locations, addInventory } = useData();
   const [name, setName] = useState(item?.name ?? '');
-  const [barcode, setBarcode] = useState(item?.barcode ?? '');
+  const [barcodes, setBarcodes] = useState<string[]>([...(item?.barcodes ?? []), '']);
   const [locationId, setLocationId] = useState('');
   const [count, setCount] = useState('');
 
+  const updateBarcode = (index: number, value: string) => {
+    const updated = [...barcodes];
+    updated[index] = value;
+    // Add a new empty input if the user is typing in the last field
+    if (index === updated.length - 1 && value !== '') {
+      updated.push('');
+    }
+    setBarcodes(updated);
+  };
+
+  const removeBarcode = (index: number) => {
+    const updated = barcodes.filter((_, i) => i !== index);
+    // Always keep at least one empty input
+    if (updated.length === 0 || updated[updated.length - 1] !== '') {
+      updated.push('');
+    }
+    setBarcodes(updated);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const filteredBarcodes = barcodes.filter((b) => b.trim() !== '');
     if (item) {
-      updateItem(item.id, { name, barcode });
+      updateItem(item.id, { name, barcodes: filteredBarcodes });
       navigate(`/items/${item.id}`);
     } else {
-      const newItem = addItem({ name, barcode });
+      const newItem = addItem({ name, barcodes: filteredBarcodes });
       if (locationId) {
         addInventory({ itemId: newItem.id, locationId, count: parseInt(count, 10) || 0 });
       }
@@ -52,14 +73,25 @@ export function ItemForm({ item }: ItemFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="barcode">Barcode</Label>
-            <Input
-              id="barcode"
-              value={barcode}
-              onChange={(e) => setBarcode(e.target.value)}
-              placeholder="Enter barcode"
-              required
-            />
+            <Label>Barcodes</Label>
+            {barcodes.map((barcode, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  value={barcode}
+                  onChange={(e) => updateBarcode(index, e.target.value)}
+                  placeholder="Enter barcode"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeBarcode(index)}
+                  disabled={barcodes.length === 1 && barcode === ''}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
           {!item && (
             <>

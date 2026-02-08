@@ -1,0 +1,57 @@
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useData } from '@/context/DataContext';
+import type { Inventory } from '@/types';
+
+interface InventoryDetailsProps {
+  inventory: Inventory;
+}
+
+export function InventoryDetails({ inventory }: InventoryDetailsProps) {
+  const navigate = useNavigate();
+  const { getItem, getLocation, deleteInventory } = useData();
+
+  const item = getItem(inventory.itemId);
+  const location = getLocation(inventory.locationId);
+
+  const handleDelete = () => {
+    deleteInventory(inventory.id);
+    navigate('/inventory');
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Inventory Entry</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Item</p>
+          <p>{item?.name ?? 'Unknown Item'}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Location</p>
+          <p>{location?.name ?? 'Unknown Location'}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Count</p>
+          <p className="text-2xl font-bold">{inventory.count}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Created</p>
+          <p>{inventory.createdAt.toLocaleDateString()}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate(`/inventory/${inventory.id}/edit`)}>Edit</Button>
+          <Button variant="destructive" onClick={handleDelete}>
+            Delete
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/inventory')}>
+            Back to List
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

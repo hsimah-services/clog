@@ -15,9 +15,11 @@ export function Header() {
     <header className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
-          <Link to="/" className="text-xl font-bold">
-            Clog
-          </Link>
+          <div className="flex items-center gap-2">
+            <img src="/clog.png" className="h-8 w-8" alt="Clog logo" />
+            <Link to="/" className="text-xl font-bold">
+              clog
+            </Link></div>
           <nav className="flex items-center gap-6">
             {navItems.map((item) => (
               <Link

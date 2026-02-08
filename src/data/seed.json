@@ -11,10 +11,23 @@
     { "id": "loc-4", "name": "Kitchen Freezer", "createdAt": "2025-01-10T09:15:00.000Z" }
   ],
   "inventory": [
-    { "id": "inv-1", "itemId": "item-1", "locationId": "loc-3", "count": 2, "createdAt": "2025-01-20T12:00:00.000Z" },
-    { "id": "inv-2", "itemId": "item-1", "locationId": "loc-1", "count": 5, "createdAt": "2025-01-20T12:05:00.000Z" },
-    { "id": "inv-3", "itemId": "item-2", "locationId": "loc-1", "count": 3, "createdAt": "2025-01-21T14:00:00.000Z" },
-    { "id": "inv-4", "itemId": "item-3", "locationId": "loc-3", "count": 8, "createdAt": "2025-01-22T10:30:00.000Z" },
-    { "id": "inv-5", "itemId": "item-3", "locationId": "loc-2", "count": 12, "createdAt": "2025-01-22T10:35:00.000Z" }
+    { "id": "inv-1a", "itemId": "item-1", "locationId": "loc-3", "dateAdded": "2025-01-20T12:00:00.000Z", "dateExpiry": "2025-07-20T00:00:00.000Z", "createdAt": "2025-01-20T12:00:00.000Z" },
+    { "id": "inv-1b", "itemId": "item-1", "locationId": "loc-3", "dateAdded": "2025-01-22T09:00:00.000Z", "dateExpiry": "2025-08-01T00:00:00.000Z", "createdAt": "2025-01-22T09:00:00.000Z" },
+
+    { "id": "inv-2a", "itemId": "item-1", "locationId": "loc-1", "dateAdded": "2025-01-20T12:05:00.000Z", "dateExpiry": "2025-06-15T00:00:00.000Z", "createdAt": "2025-01-20T12:05:00.000Z" },
+    { "id": "inv-2b", "itemId": "item-1", "locationId": "loc-1", "dateAdded": "2025-01-21T10:00:00.000Z", "dateExpiry": "2025-09-01T00:00:00.000Z", "createdAt": "2025-01-21T10:00:00.000Z" },
+    { "id": "inv-2c", "itemId": "item-1", "locationId": "loc-1", "dateAdded": "2025-01-25T14:30:00.000Z", "dateExpiry": null, "createdAt": "2025-01-25T14:30:00.000Z" },
+
+    { "id": "inv-3a", "itemId": "item-2", "locationId": "loc-1", "dateAdded": "2025-01-21T14:00:00.000Z", "dateExpiry": null, "createdAt": "2025-01-21T14:00:00.000Z" },
+    { "id": "inv-3b", "itemId": "item-2", "locationId": "loc-1", "dateAdded": "2025-01-23T08:00:00.000Z", "dateExpiry": null, "createdAt": "2025-01-23T08:00:00.000Z" },
+    { "id": "inv-3c", "itemId": "item-2", "locationId": "loc-1", "dateAdded": "2025-01-26T11:00:00.000Z", "dateExpiry": null, "createdAt": "2025-01-26T11:00:00.000Z" },
+
+    { "id": "inv-4a", "itemId": "item-3", "locationId": "loc-3", "dateAdded": "2025-01-22T10:30:00.000Z", "dateExpiry": "2025-04-22T00:00:00.000Z", "createdAt": "2025-01-22T10:30:00.000Z" },
+    { "id": "inv-4b", "itemId": "item-3", "locationId": "loc-3", "dateAdded": "2025-01-23T10:30:00.000Z", "dateExpiry": "2025-05-01T00:00:00.000Z", "createdAt": "2025-01-23T10:30:00.000Z" },
+    { "id": "inv-4c", "itemId": "item-3", "locationId": "loc-3", "dateAdded": "2025-01-24T10:30:00.000Z", "dateExpiry": null, "createdAt": "2025-01-24T10:30:00.000Z" },
+
+    { "id": "inv-5a", "itemId": "item-3", "locationId": "loc-2", "dateAdded": "2025-01-22T10:35:00.000Z", "dateExpiry": "2025-06-01T00:00:00.000Z", "createdAt": "2025-01-22T10:35:00.000Z" },
+    { "id": "inv-5b", "itemId": "item-3", "locationId": "loc-2", "dateAdded": "2025-01-23T10:35:00.000Z", "dateExpiry": "2025-06-15T00:00:00.000Z", "createdAt": "2025-01-23T10:35:00.000Z" },
+    { "id": "inv-5c", "itemId": "item-3", "locationId": "loc-2", "dateAdded": "2025-01-24T10:35:00.000Z", "dateExpiry": null, "createdAt": "2025-01-24T10:35:00.000Z" }
   ]
 }

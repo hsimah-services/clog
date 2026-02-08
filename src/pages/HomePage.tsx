@@ -59,7 +59,7 @@ export function HomePage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{inventory.length}</p>
-            <p className="text-sm text-muted-foreground">Total entries</p>
+            <p className="text-sm text-muted-foreground">Total items in stock</p>
             <div className="mt-4 flex gap-2">
               <Button asChild size="sm">
                 <Link to="/inventory">View All</Link>

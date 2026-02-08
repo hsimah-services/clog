@@ -35,8 +35,12 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
           <p>{location?.name ?? 'Unknown Location'}</p>
         </div>
         <div>
-          <p className="text-sm text-muted-foreground">Count</p>
-          <p className="text-2xl font-bold">{inventory.count}</p>
+          <p className="text-sm text-muted-foreground">Date Added</p>
+          <p>{inventory.dateAdded.toLocaleDateString()}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Expiry Date</p>
+          <p>{inventory.dateExpiry ? inventory.dateExpiry.toLocaleDateString() : 'No expiry'}</p>
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Created</p>

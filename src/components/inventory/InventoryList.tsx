@@ -14,7 +14,8 @@ import {
 import { useData } from '@/context/DataContext';
 
 interface GroupEntry {
-  inventoryId: string;
+  itemId: string;
+  inventoryIds: string[];
   locationId: string;
   locationName: string;
   count: number;
@@ -28,7 +29,7 @@ interface ItemGroup {
 }
 
 export function InventoryList() {
-  const { inventory, getItem, getLocation, updateInventory, getInventory } = useData();
+  const { inventory, getItem, getLocation, addInventory, deleteInventory } = useData();
   const [search, setSearch] = useState('');
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
@@ -36,21 +37,36 @@ export function InventoryList() {
     const item = getItem(inv.itemId);
     const location = getLocation(inv.locationId);
     const existing = map.get(inv.itemId);
-    const entry: GroupEntry = {
-      inventoryId: inv.id,
-      locationId: inv.locationId,
-      locationName: location?.name ?? 'Unknown',
-      count: inv.count,
-    };
+
     if (existing) {
-      existing.entries.push(entry);
-      existing.totalCount += inv.count;
+      const existingEntry = existing.entries.find((e) => e.locationId === inv.locationId);
+      if (existingEntry) {
+        existingEntry.inventoryIds.push(inv.id);
+        existingEntry.count += 1;
+      } else {
+        existing.entries.push({
+          itemId: inv.itemId,
+          inventoryIds: [inv.id],
+          locationId: inv.locationId,
+          locationName: location?.name ?? 'Unknown',
+          count: 1,
+        });
+      }
+      existing.totalCount += 1;
     } else {
       map.set(inv.itemId, {
         itemId: inv.itemId,
         itemName: item?.name ?? 'Unknown',
-        entries: [entry],
-        totalCount: inv.count,
+        entries: [
+          {
+            itemId: inv.itemId,
+            inventoryIds: [inv.id],
+            locationId: inv.locationId,
+            locationName: location?.name ?? 'Unknown',
+            count: 1,
+          },
+        ],
+        totalCount: 1,
       });
     }
     return map;
@@ -113,13 +129,18 @@ export function InventoryList() {
                   group={group}
                   isExpanded={isExpanded}
                   onToggle={() => toggleExpand(group.itemId)}
-                  onIncrement={(inventoryId) => {
-                    const inv = getInventory(inventoryId);
-                    if (inv) updateInventory(inventoryId, { count: inv.count + 1 });
+                  onIncrement={(entry) => {
+                    addInventory({
+                      itemId: entry.itemId,
+                      locationId: entry.locationId,
+                      dateAdded: new Date(),
+                      dateExpiry: null,
+                    });
                   }}
-                  onDecrement={(inventoryId) => {
-                    const inv = getInventory(inventoryId);
-                    if (inv && inv.count > 0) updateInventory(inventoryId, { count: inv.count - 1 });
+                  onDecrement={(entry) => {
+                    if (entry.inventoryIds.length > 0) {
+                      deleteInventory(entry.inventoryIds[entry.inventoryIds.length - 1]);
+                    }
                   }}
                 />
               );
@@ -141,8 +162,8 @@ function InventoryGroupRow({
   group: ItemGroup;
   isExpanded: boolean;
   onToggle: () => void;
-  onIncrement: (inventoryId: string) => void;
-  onDecrement: (inventoryId: string) => void;
+  onIncrement: (entry: GroupEntry) => void;
+  onDecrement: (entry: GroupEntry) => void;
 }) {
   const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
 
@@ -163,7 +184,7 @@ function InventoryGroupRow({
         </TableCell>
         <TableCell>
           {group.entries.map((entry, i) => (
-            <span key={entry.inventoryId}>
+            <span key={entry.locationId}>
               {i > 0 && ', '}
               <Link
                 to={`/locations/${entry.locationId}`}
@@ -180,7 +201,7 @@ function InventoryGroupRow({
       </TableRow>
       {isExpanded &&
         group.entries.map((entry) => (
-          <TableRow key={entry.inventoryId} className="bg-muted/50">
+          <TableRow key={entry.locationId} className="bg-muted/50">
             <TableCell />
             <TableCell />
             <TableCell className="pl-8">
@@ -200,8 +221,9 @@ function InventoryGroupRow({
                   className="h-7 w-7 rounded-r-none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDecrement(entry.inventoryId);
+                    onDecrement(entry);
                   }}
+                  disabled={entry.count === 0}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
@@ -211,7 +233,7 @@ function InventoryGroupRow({
                   className="h-7 w-7 rounded-none border-l-0"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onIncrement(entry.inventoryId);
+                    onIncrement(entry);
                   }}
                 >
                   <Plus className="h-3 w-3" />
@@ -222,7 +244,7 @@ function InventoryGroupRow({
                   className="h-7 w-7 rounded-l-none border-l-0"
                   asChild
                 >
-                  <Link to={`/inventory/${entry.inventoryId}`} onClick={(e) => e.stopPropagation()}>
+                  <Link to={`/inventory/${entry.inventoryIds[0]}`} onClick={(e) => e.stopPropagation()}>
                     <Info className="h-3 w-3" />
                   </Link>
                 </Button>

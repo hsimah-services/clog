@@ -49,7 +49,10 @@ export function ItemForm({ item }: ItemFormProps) {
     } else {
       const newItem = addItem({ name, barcodes: filteredBarcodes });
       if (locationId) {
-        addInventory({ itemId: newItem.id, locationId, count: parseInt(count, 10) || 0 });
+        const itemCount = parseInt(count, 10) || 0;
+        for (let i = 0; i < itemCount; i++) {
+          addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry: null });
+        }
       }
       navigate(`/items/${newItem.id}`);
     }

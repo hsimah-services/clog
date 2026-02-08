@@ -15,6 +15,7 @@ export interface Inventory {
   id: string;
   itemId: string;
   locationId: string;
-  count: number;
+  dateAdded: Date;
+  dateExpiry: Date | null;
   createdAt: Date;
 }

@@ -12,20 +12,36 @@ interface InventoryFormProps {
   inventory?: Inventory;
 }
 
+function toDateInputValue(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
 export function InventoryForm({ inventory }: InventoryFormProps) {
   const navigate = useNavigate();
   const { items, locations, addInventory, updateInventory } = useData();
   const [itemId, setItemId] = useState(inventory?.itemId ?? '');
   const [locationId, setLocationId] = useState(inventory?.locationId ?? '');
-  const [count, setCount] = useState(inventory?.count?.toString() ?? '');
+  const [dateAdded] = useState(toDateInputValue(inventory?.dateAdded ?? new Date()));
+  const [dateExpiry, setDateExpiry] = useState(
+    inventory?.dateExpiry ? toDateInputValue(inventory.dateExpiry) : ''
+  );
+
+  const isEditing = !!inventory;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = { itemId, locationId, count: parseInt(count, 10) };
-    if (inventory) {
-      updateInventory(inventory.id, data);
+    if (isEditing) {
+      updateInventory(inventory.id, {
+        dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
+      });
       navigate(`/inventory/${inventory.id}`);
     } else {
+      const data = {
+        itemId,
+        locationId,
+        dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
+        dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
+      };
       const newInventory = addInventory(data);
       navigate(`/inventory/${newInventory.id}`);
     }
@@ -34,7 +50,7 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{inventory ? 'Edit Inventory' : 'New Inventory Entry'}</CardTitle>
+        <CardTitle>{isEditing ? 'Edit Inventory' : 'New Inventory Entry'}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -45,6 +61,7 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
               value={itemId}
               onChange={(e) => setItemId(e.target.value)}
               required
+              disabled={isEditing}
             >
               <option value="">Select an item</option>
               {items.map((item) => (
@@ -61,6 +78,7 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
               value={locationId}
               onChange={(e) => setLocationId(e.target.value)}
               required
+              disabled={isEditing}
             >
               <option value="">Select a location</option>
               {locations.map((location) => (
@@ -71,19 +89,25 @@ export function InventoryForm({ inventory }: InventoryFormProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="count">Count</Label>
+            <Label htmlFor="dateAdded">Date Added</Label>
             <Input
-              id="count"
-              type="number"
-              min="0"
-              value={count}
-              onChange={(e) => setCount(e.target.value)}
-              placeholder="Enter count"
-              required
+              id="dateAdded"
+              type="date"
+              value={dateAdded}
+              readOnly
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dateExpiry">Expiry Date (optional)</Label>
+            <Input
+              id="dateExpiry"
+              type="date"
+              value={dateExpiry}
+              onChange={(e) => setDateExpiry(e.target.value)}
             />
           </div>
           <div className="flex gap-2">
-            <Button type="submit">{inventory ? 'Update' : 'Create'}</Button>
+            <Button type="submit">{isEditing ? 'Update' : 'Create'}</Button>
             <Button type="button" variant="outline" onClick={() => navigate(-1)}>
               Cancel
             </Button>

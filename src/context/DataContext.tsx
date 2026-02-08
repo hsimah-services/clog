@@ -31,7 +31,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     seedData.locations.map((l) => ({ ...l, createdAt: new Date(l.createdAt) }))
   );
   const [inventory, setInventory] = useState<Inventory[]>(
-    seedData.inventory.map((v) => ({ ...v, createdAt: new Date(v.createdAt) }))
+    seedData.inventory.map((v) => ({
+      ...v,
+      dateAdded: new Date(v.dateAdded),
+      dateExpiry: v.dateExpiry ? new Date(v.dateExpiry) : null,
+      createdAt: new Date(v.createdAt),
+    }))
   );
 
   const addItem = (itemData: Omit<Item, 'id' | 'createdAt'>): Item => {

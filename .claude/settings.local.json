@@ -5,7 +5,11 @@
       "Bash(gh issue view:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(git checkout:*)",
+      "Bash(ldconfig:*)",
+      "Bash(dpkg:*)",
+      "Bash(npx playwright test:*)"
     ]
   }
 }

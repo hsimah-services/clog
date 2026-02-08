@@ -19,7 +19,7 @@ export function ItemList() {
   const filteredItems = items.filter(
     (item) =>
       item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.barcode.toLowerCase().includes(search.toLowerCase())
+      item.barcodes.some((b) => b.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -58,7 +58,7 @@ export function ItemList() {
                     {item.name}
                   </Link>
                 </TableCell>
-                <TableCell className="font-mono">{item.barcode}</TableCell>
+                <TableCell className="font-mono">{item.barcodes.join(', ')}</TableCell>
                 <TableCell>{item.createdAt.toLocaleDateString()}</TableCell>
               </TableRow>
             ))

@@ -5,7 +5,7 @@ import { CloseButton } from '@/components/ui/CloseButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
 import { calcExpiryDate } from '@/lib/utils';
 import type { Inventory } from '@/types';
@@ -61,73 +61,76 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
   };
 
   return (
-    <Card>
-      <CardHeader >
-        <CardTitle>{isEditing ? 'Edit Inventory' : 'New Inventory Entry'}</CardTitle>
-        {onClose && <CloseButton onClose={onClose} />}
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="item">Item</Label>
-            <Select
-              id="item"
-              value={itemId}
-              onChange={(e) => handleItemChange(e.target.value)}
-              required
-              disabled={isEditing}
-            >
-              <option value="">Select an item</option>
-              {items.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Select
-              id="location"
-              value={locationId}
-              onChange={(e) => setLocationId(e.target.value)}
-              required
-              disabled={isEditing}
-            >
-              <option value="">Select a location</option>
-              {locations.map((location) => (
-                <option key={location.id} value={location.id}>
-                  {location.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dateAdded">Date Added</Label>
-            <Input
-              id="dateAdded"
-              type="date"
-              value={dateAdded}
-              readOnly
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dateExpiry">Expiry Date (optional)</Label>
-            <Input
-              id="dateExpiry"
-              type="date"
-              value={dateExpiry}
-              onChange={(e) => setDateExpiry(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit">{isEditing ? 'Update' : 'Create'}</Button>
-            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <Card
+      header={
+        <CardHeader title={<CardTitle>{isEditing ? 'Edit Inventory' : 'New Inventory Entry'}</CardTitle>}>
+          {onClose && <CloseButton onClose={onClose} />}
+        </CardHeader>
+      }
+      content={
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="item">Item</Label>
+              <Select
+                id="item"
+                value={itemId}
+                onChange={(e) => handleItemChange(e.target.value)}
+                required
+                disabled={isEditing}
+              >
+                <option value="">Select an item</option>
+                {items.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Select
+                id="location"
+                value={locationId}
+                onChange={(e) => setLocationId(e.target.value)}
+                required
+                disabled={isEditing}
+              >
+                <option value="">Select a location</option>
+                {locations.map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {location.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateAdded">Date Added</Label>
+              <Input
+                id="dateAdded"
+                type="date"
+                value={dateAdded}
+                readOnly
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateExpiry">Expiry Date (optional)</Label>
+              <Input
+                id="dateExpiry"
+                type="date"
+                value={dateExpiry}
+                onChange={(e) => setDateExpiry(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit">{isEditing ? 'Update' : 'Create'}</Button>
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      }
+    />
   );
 }

@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CloseButton } from '@/components/ui/CloseButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
 import { calcExpiryDate } from '@/lib/utils';
 import type { Item, DefaultExpiry } from '@/types';
@@ -68,105 +67,105 @@ export function ItemForm({ item }: ItemFormProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{item ? 'Edit Item' : 'New Item'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter item name"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Barcodes</Label>
-            {barcodes.map((barcode, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={barcode}
-                  onChange={(e) => updateBarcode(index, e.target.value)}
-                  placeholder="Enter barcode"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeBarcode(index)}
-                  disabled={barcodes.length === 1 && barcode === ''}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-2">
-            <Label>Default Expiry (optional)</Label>
-            <div className="flex gap-2">
+    <Card
+      header={<CardHeader title={<CardTitle>{item ? 'Edit Item' : 'New Item'}</CardTitle>} />}
+      content={
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
               <Input
-                type="number"
-                min="0"
-                value={expiryValue}
-                onChange={(e) => setExpiryValue(e.target.value)}
-                placeholder="e.g. 6"
-                className="max-w-[120px]"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter item name"
+                required
               />
-              <Select
-                value={expiryUnit}
-                onChange={(e) => setExpiryUnit(e.target.value as 'days' | 'months')}
-                className="max-w-[120px]"
-              >
-                <option value="days">Days</option>
-                <option value="months">Months</option>
-              </Select>
             </div>
-          </div>
-          {!item && (
-            <>
-              <div className="border-t pt-4 mt-4">
-                <Label className="text-base font-semibold">Initial Inventory (optional)</Label>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Select
-                  id="location"
-                  value={locationId}
-                  onChange={(e) => setLocationId(e.target.value)}
-                >
-                  <option value="">Select a location</option>
-                  {locations.map((location) => (
-                    <option key={location.id} value={location.id}>
-                      {location.name}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="count">Count</Label>
+            <div className="space-y-2">
+              <Label>Barcodes</Label>
+              {barcodes.map((barcode, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={barcode}
+                    onChange={(e) => updateBarcode(index, e.target.value)}
+                    placeholder="Enter barcode"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeBarcode(index)}
+                    disabled={barcodes.length === 1 && barcode === ''}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <Label>Default Expiry (optional)</Label>
+              <div className="flex gap-2">
                 <Input
-                  id="count"
                   type="number"
                   min="0"
-                  value={count}
-                  onChange={(e) => setCount(e.target.value)}
-                  placeholder="Enter count"
+                  value={expiryValue}
+                  onChange={(e) => setExpiryValue(e.target.value)}
+                  placeholder="e.g. 6"
+                  className="max-w-[120px]"
                 />
+                <Select
+                  value={expiryUnit}
+                  onChange={(e) => setExpiryUnit(e.target.value as 'days' | 'months')}
+                  className="max-w-[120px]"
+                >
+                  <option value="days">Days</option>
+                  <option value="months">Months</option>
+                </Select>
               </div>
-            </>
-          )}
-          <div className="flex gap-2">
-            <Button type="submit">{item ? 'Update' : 'Create'}</Button>
-            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+            </div>
+            {!item && (
+              <>
+                <div className="border-t pt-4 mt-4">
+                  <Label className="text-base font-semibold">Initial Inventory (optional)</Label>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Select
+                    id="location"
+                    value={locationId}
+                    onChange={(e) => setLocationId(e.target.value)}
+                  >
+                    <option value="">Select a location</option>
+                    {locations.map((location) => (
+                      <option key={location.id} value={location.id}>
+                        {location.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="count">Count</Label>
+                  <Input
+                    id="count"
+                    type="number"
+                    min="0"
+                    value={count}
+                    onChange={(e) => setCount(e.target.value)}
+                    placeholder="Enter count"
+                  />
+                </div>
+              </>
+            )}
+            <div className="flex gap-2">
+              <Button type="submit">{item ? 'Update' : 'Create'}</Button>
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      }
+    />
   );
 }

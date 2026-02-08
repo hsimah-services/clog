@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
 import type { Location } from '@/types';
 
@@ -28,30 +28,30 @@ export function LocationForm({ location }: LocationFormProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{location ? 'Edit Location' : 'New Location'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter location name"
-              required
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit">{location ? 'Update' : 'Create'}</Button>
-            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <Card
+      header={<CardHeader title={<CardTitle>{location ? 'Edit Location' : 'New Location'}</CardTitle>} />}
+      content={
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter location name"
+                required
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit">{location ? 'Update' : 'Create'}</Button>
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      }
+    />
   );
 }

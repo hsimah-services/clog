@@ -1,7 +1,7 @@
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CloseButton } from '@/components/ui/CloseButton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
 import type { Inventory } from '@/types';
 
@@ -22,42 +22,45 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
   };
 
   return (
-    <Card>
-      <CardHeader >
-        <CardTitle>Inventory Entry</CardTitle>
-        {onClose && <CloseButton onClose={onClose} />}
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Item</p>
-          <p>{item?.name ?? 'Unknown Item'}</p>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Location</p>
-          <p>{location?.name ?? 'Unknown Location'}</p>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Date Added</p>
-          <p>{inventory.dateAdded.toLocaleDateString()}</p>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Expiry Date</p>
-          <p>{inventory.dateExpiry ? inventory.dateExpiry.toLocaleDateString() : 'No expiry'}</p>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Created</p>
-          <p>{inventory.createdAt.toLocaleDateString()}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={() => navigate(`/inventory/${inventory.id}/edit`)}>Edit</Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Delete
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/inventory')}>
-            Back to List
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <Card
+      header={
+        <CardHeader title={<CardTitle>Inventory Entry</CardTitle>}>
+          {onClose && <CloseButton onClose={onClose} />}
+        </CardHeader>
+      }
+      content={
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Item</p>
+            <p>{item?.name ?? 'Unknown Item'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Location</p>
+            <p>{location?.name ?? 'Unknown Location'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Date Added</p>
+            <p>{inventory.dateAdded.toLocaleDateString()}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Expiry Date</p>
+            <p>{inventory.dateExpiry ? inventory.dateExpiry.toLocaleDateString() : 'No expiry'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Created</p>
+            <p>{inventory.createdAt.toLocaleDateString()}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate(`/inventory/${inventory.id}/edit`)}>Edit</Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/inventory')}>
+              Back to List
+            </Button>
+          </div>
+        </CardContent>
+      }
+    />
   );
 }

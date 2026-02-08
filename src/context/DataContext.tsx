@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { Item, Location, Inventory } from '@/types';
 import { generateId } from '@/lib/utils';
+import seedData from '@/data/seed.json';
 
 interface DataContextType {
   items: Item[];
@@ -23,9 +24,15 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Item[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [inventory, setInventory] = useState<Inventory[]>([]);
+  const [items, setItems] = useState<Item[]>(
+    seedData.items.map((i) => ({ ...i, createdAt: new Date(i.createdAt) }))
+  );
+  const [locations, setLocations] = useState<Location[]>(
+    seedData.locations.map((l) => ({ ...l, createdAt: new Date(l.createdAt) }))
+  );
+  const [inventory, setInventory] = useState<Inventory[]>(
+    seedData.inventory.map((v) => ({ ...v, createdAt: new Date(v.createdAt) }))
+  );
 
   const addItem = (itemData: Omit<Item, 'id' | 'createdAt'>): Item => {
     const newItem: Item = {

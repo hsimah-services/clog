@@ -1,0 +1,20 @@
+{
+  "items": [
+    { "id": "item-1", "name": "Heinz Ketchup", "barcode": "013000006057", "createdAt": "2025-01-15T10:30:00.000Z" },
+    { "id": "item-2", "name": "Dry Dog Food", "barcode": "017800149341", "createdAt": "2025-01-16T08:00:00.000Z" },
+    { "id": "item-3", "name": "Wet Dog Food", "barcode": "017800153560", "createdAt": "2025-01-16T08:05:00.000Z" }
+  ],
+  "locations": [
+    { "id": "loc-1", "name": "Garage Shelves", "createdAt": "2025-01-10T09:00:00.000Z" },
+    { "id": "loc-2", "name": "Garage Freezer", "createdAt": "2025-01-10T09:05:00.000Z" },
+    { "id": "loc-3", "name": "Kitchen Cabinet", "createdAt": "2025-01-10T09:10:00.000Z" },
+    { "id": "loc-4", "name": "Kitchen Freezer", "createdAt": "2025-01-10T09:15:00.000Z" }
+  ],
+  "inventory": [
+    { "id": "inv-1", "itemId": "item-1", "locationId": "loc-3", "count": 2, "createdAt": "2025-01-20T12:00:00.000Z" },
+    { "id": "inv-2", "itemId": "item-1", "locationId": "loc-1", "count": 5, "createdAt": "2025-01-20T12:05:00.000Z" },
+    { "id": "inv-3", "itemId": "item-2", "locationId": "loc-1", "count": 3, "createdAt": "2025-01-21T14:00:00.000Z" },
+    { "id": "inv-4", "itemId": "item-3", "locationId": "loc-3", "count": 8, "createdAt": "2025-01-22T10:30:00.000Z" },
+    { "id": "inv-5", "itemId": "item-3", "locationId": "loc-2", "count": 12, "createdAt": "2025-01-22T10:35:00.000Z" }
+  ]
+}

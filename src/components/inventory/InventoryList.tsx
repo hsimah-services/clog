@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Plus, Minus, ExternalLink } from 'lucide-react';
+import { ChevronRight, ChevronDown, Plus, Minus, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -223,7 +223,7 @@ function InventoryGroupRow({
                   asChild
                 >
                   <Link to={`/inventory/${entry.inventoryId}`} onClick={(e) => e.stopPropagation()}>
-                    <ExternalLink className="h-3 w-3" />
+                    <Info className="h-3 w-3" />
                   </Link>
                 </Button>
               </div>

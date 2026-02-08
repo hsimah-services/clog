@@ -19,18 +19,21 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/items" element={<ItemsPage />} />
-            <Route path="/items/new" element={<NewItemPage />} />
-            <Route path="/items/:id" element={<ItemPage />} />
-            <Route path="/items/:id/edit" element={<EditItemPage />} />
-            <Route path="/locations" element={<LocationsPage />} />
-            <Route path="/locations/new" element={<NewLocationPage />} />
-            <Route path="/locations/:id" element={<LocationPage />} />
-            <Route path="/locations/:id/edit" element={<EditLocationPage />} />
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/inventory/new" element={<NewInventoryPage />} />
-            <Route path="/inventory/:id" element={<InventoryItemPage />} />
-            <Route path="/inventory/:id/edit" element={<EditInventoryPage />} />
+            <Route path="/items" element={<ItemsPage />}>
+              <Route path="new" element={<NewItemPage />} />
+              <Route path=":id" element={<ItemPage />} />
+              <Route path=":id/edit" element={<EditItemPage />} />
+            </Route>
+            <Route path="/locations" element={<LocationsPage />}>
+              <Route path="new" element={<NewLocationPage />} />
+              <Route path=":id" element={<LocationPage />} />
+              <Route path=":id/edit" element={<EditLocationPage />} />
+            </Route>
+            <Route path="/inventory" element={<InventoryPage />}>
+              <Route path="new" element={<NewInventoryPage />} />
+              <Route path=":id" element={<InventoryItemPage />} />
+              <Route path=":id/edit" element={<EditInventoryPage />} />
+            </Route>
           </Routes>
         </Layout>
       </BrowserRouter>

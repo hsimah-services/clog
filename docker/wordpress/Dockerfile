@@ -13,7 +13,7 @@ RUN curl -L -o /tmp/wp-graphql.zip https://downloads.wordpress.org/plugin/wp-gra
     && rm /tmp/wp-graphql.zip
 
 # Download and install WPGraphQL JWT Authentication plugin
-RUN curl -L -o /tmp/wp-graphql-jwt-auth.zip https://github.com/wp-graphql/wp-graphql-jwt-authentication/releases/latest/download/wp-graphql-jwt-authentication.zip \
+RUN curl -L -o /tmp/wp-graphql-jwt-auth.zip https://github.com/wp-graphql/wp-graphql-jwt-authentication/archive/refs/tags/v0.7.0.zip \
     && unzip /tmp/wp-graphql-jwt-auth.zip -d /usr/src/wordpress/wp-content/plugins/ \
     && rm /tmp/wp-graphql-jwt-auth.zip
 

@@ -23,8 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 
+# Vite
+/client/.vite
+
 # Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+/client/test-results/
+/client/playwright-report/
+/client/blob-report/
+/client/playwright/.cache/
+
+# Environment
+.env
+
+# Docker volumes
+db_data/

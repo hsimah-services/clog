@@ -51,7 +51,7 @@ export function ItemForm({ item, initialBarcodes }: ItemFormProps) {
     setBarcodes((prev) => [...prev, barcode]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const filteredBarcodes = barcodes.filter((b) => b.trim() !== '');
     const parsedExpiry = parseInt(expiryValue, 10);
@@ -59,15 +59,15 @@ export function ItemForm({ item, initialBarcodes }: ItemFormProps) {
       ? { unit: expiryUnit, value: parsedExpiry }
       : null;
     if (item) {
-      updateItem(item.id, { name, barcodes: filteredBarcodes, defaultExpiry });
+      await updateItem(item.id, { name, barcodes: filteredBarcodes, defaultExpiry });
       navigate(`/items/${item.id}`);
     } else {
-      const newItem = addItem({ name, barcodes: filteredBarcodes, defaultExpiry });
+      const newItem = await addItem({ name, barcodes: filteredBarcodes, defaultExpiry });
       if (locationId) {
         const itemCount = parseInt(count, 10) || 0;
         const dateExpiry = defaultExpiry ? calcExpiryDate(defaultExpiry) : null;
         for (let i = 0; i < itemCount; i++) {
-          addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry });
+          await addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry });
         }
       }
       navigate(`/items/${newItem.id}`);

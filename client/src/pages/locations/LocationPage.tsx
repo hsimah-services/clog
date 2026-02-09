@@ -5,8 +5,12 @@ import { useData } from '@/context/DataContext';
 
 export function LocationPage() {
   const { id } = useParams<{ id: string }>();
-  const { getLocation } = useData();
+  const { getLocation, loading } = useData();
   const location = id ? getLocation(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!location) {
     return <div className="text-muted-foreground">Location not found</div>;
@@ -21,8 +25,12 @@ export function LocationPage() {
 
 export function EditLocationPage() {
   const { id } = useParams<{ id: string }>();
-  const { getLocation } = useData();
+  const { getLocation, loading } = useData();
   const location = id ? getLocation(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!location) {
     return <div className="text-muted-foreground">Location not found</div>;

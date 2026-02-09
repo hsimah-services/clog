@@ -16,13 +16,13 @@ export function LocationForm({ location }: LocationFormProps) {
   const { addLocation, updateLocation } = useData();
   const [name, setName] = useState(location?.name ?? '');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (location) {
-      updateLocation(location.id, { name });
+      await updateLocation(location.id, { name });
       navigate(`/locations/${location.id}`);
     } else {
-      const newLocation = addLocation({ name });
+      const newLocation = await addLocation({ name });
       navigate(`/locations/${newLocation.id}`);
     }
   };

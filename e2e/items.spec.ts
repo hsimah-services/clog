@@ -41,6 +41,7 @@ test.describe('Items', () => {
     await page.goto('/items/new');
 
     await page.getByLabel('Name').fill('Milk');
+    await page.getByRole('button', { name: 'Set manually' }).click();
     await page.getByPlaceholder('Enter barcode').first().fill('1234567890');
 
     // Set default expiry

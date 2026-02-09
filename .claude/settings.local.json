@@ -10,7 +10,8 @@
       "Bash(ldconfig:*)",
       "Bash(dpkg:*)",
       "Bash(npx playwright test:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run test:e2e:*)"
     ]
   }
 }

@@ -15,6 +15,8 @@ function clog_register_graphql_types(): void {
 	clog_register_item_fields();
 	clog_register_location_fields();
 	clog_register_inventory_fields();
+	clog_register_item_mutation_inputs();
+	clog_register_inventory_mutation_inputs();
 }
 
 /**
@@ -137,4 +139,100 @@ function clog_register_inventory_fields(): void {
 			return get_post_meta( $post->databaseId, 'clog_date_expiry', true ) ?: null;
 		},
 	] );
+}
+
+/**
+ * Register mutation input fields for ClogItem create/update.
+ */
+function clog_register_item_mutation_inputs(): void {
+	$fields = [
+		'barcodes' => [
+			'type'        => [ 'list_of' => 'String' ],
+			'description' => 'Barcodes associated with this item',
+		],
+		'defaultExpiryUnit' => [
+			'type'        => 'ClogExpiryUnit',
+			'description' => 'Default expiry unit (days or months)',
+		],
+		'defaultExpiryValue' => [
+			'type'        => 'Int',
+			'description' => 'Default expiry duration value',
+		],
+	];
+
+	foreach ( [ 'CreateClogItemInput', 'UpdateClogItemInput' ] as $input_type ) {
+		foreach ( $fields as $field_name => $config ) {
+			register_graphql_field( $input_type, $field_name, $config );
+		}
+	}
+}
+
+/**
+ * Register mutation input fields for ClogInventory create/update.
+ */
+function clog_register_inventory_mutation_inputs(): void {
+	$fields = [
+		'clogItemId' => [
+			'type'        => 'Int',
+			'description' => 'Post ID of the related item',
+		],
+		'clogLocationId' => [
+			'type'        => 'Int',
+			'description' => 'Post ID of the related location',
+		],
+		'dateAdded' => [
+			'type'        => 'String',
+			'description' => 'Date added (ISO 8601)',
+		],
+		'dateExpiry' => [
+			'type'        => 'String',
+			'description' => 'Expiry date (ISO 8601)',
+		],
+	];
+
+	foreach ( [ 'CreateClogInventoryInput', 'UpdateClogInventoryInput' ] as $input_type ) {
+		foreach ( $fields as $field_name => $config ) {
+			register_graphql_field( $input_type, $field_name, $config );
+		}
+	}
+}
+
+/**
+ * Save custom meta fields when mutations fire.
+ */
+add_action( 'graphql_post_object_mutation_update_additional_data', 'clog_save_mutation_meta', 10, 6 );
+
+function clog_save_mutation_meta( $post_id, $input, $post_type_object, $mutation_name, $context, $info ): void {
+	$post_type = get_post_type( $post_id );
+
+	if ( 'clog_item' === $post_type ) {
+		if ( isset( $input['barcodes'] ) ) {
+			update_post_meta( $post_id, 'clog_barcodes', $input['barcodes'] );
+		}
+		if ( isset( $input['defaultExpiryUnit'] ) ) {
+			update_post_meta( $post_id, 'clog_default_expiry_unit', $input['defaultExpiryUnit'] );
+		}
+		if ( isset( $input['defaultExpiryValue'] ) ) {
+			update_post_meta( $post_id, 'clog_default_expiry_value', (int) $input['defaultExpiryValue'] );
+		}
+	}
+
+	if ( 'clog_inventory' === $post_type ) {
+		if ( isset( $input['clogItemId'] ) ) {
+			update_post_meta( $post_id, 'clog_item_id', (int) $input['clogItemId'] );
+		}
+		if ( isset( $input['clogLocationId'] ) ) {
+			update_post_meta( $post_id, 'clog_location_id', (int) $input['clogLocationId'] );
+		}
+		if ( isset( $input['dateAdded'] ) ) {
+			update_post_meta( $post_id, 'clog_date_added', sanitize_text_field( $input['dateAdded'] ) );
+		}
+		if ( array_key_exists( 'dateExpiry', $input ) ) {
+			if ( empty( $input['dateExpiry'] ) ) {
+				delete_post_meta( $post_id, 'clog_date_expiry' );
+			} else {
+				update_post_meta( $post_id, 'clog_date_expiry', sanitize_text_field( $input['dateExpiry'] ) );
+			}
+		}
+	}
 }

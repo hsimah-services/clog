@@ -31,3 +31,9 @@ dist-ssr
 /client/playwright-report/
 /client/blob-report/
 /client/playwright/.cache/
+
+# Environment
+.env
+
+# Docker volumes
+db_data/

@@ -1,7 +1,7 @@
 services:
   db:
     image: mysql:8.0
-    restart: unless-stopped
+    restart: "no"
     env_file: .env
     volumes:
       - db_data:/var/lib/mysql
@@ -15,7 +15,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "6379:6379"
     healthcheck:
@@ -27,7 +27,7 @@ services:
   wordpress:
     build:
       context: ./docker/wordpress
-    restart: unless-stopped
+    restart: "no"
     env_file: .env
     depends_on:
       db:
@@ -53,7 +53,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin:latest
-    restart: unless-stopped
+    restart: "no"
     depends_on:
       db:
         condition: service_healthy
@@ -66,7 +66,7 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -74,7 +74,7 @@ services:
   client:
     build:
       context: ./client
-    restart: unless-stopped
+    restart: "no"
     depends_on:
       - wordpress
     ports:

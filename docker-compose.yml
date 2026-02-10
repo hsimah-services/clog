@@ -84,7 +84,7 @@ services:
       - ./client/src:/app/src
       - ./client/public:/app/public
     environment:
-      VITE_GRAPHQL_URL: http://wordpress:80/graphql
+      VITE_GRAPHQL_URL: http://localhost:8080/graphql
 
 volumes:
   db_data:

@@ -83,7 +83,7 @@ function transformItem(gqlItem: GraphQLItem): Item {
     name: gqlItem.title,
     barcodes: gqlItem.barcodes ?? [],
     defaultExpiry: gqlItem.defaultExpiry
-      ? { unit: gqlItem.defaultExpiry.unit as 'days' | 'months', value: gqlItem.defaultExpiry.value }
+      ? { unit: gqlItem.defaultExpiry.unit.toLowerCase() as 'days' | 'months', value: gqlItem.defaultExpiry.value }
       : null,
     createdAt: new Date(gqlItem.date),
   };

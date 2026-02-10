@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: "no"
+    env_file: ../../../.env.ci
+    tmpfs:
+      - /var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: "no"
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    build:
+      context: ../../../docker/wordpress
+    restart: "no"
+    env_file: ../../../.env.ci
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ../../../server/plugins/clog:/var/www/html/wp-content/plugins/clog
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', '${REDIS_HOST}');
+        define('WP_REDIS_PORT', ${REDIS_PORT});
+        define('WP_CACHE', true);
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${GRAPHQL_JWT_AUTH_SECRET_KEY}');

@@ -13,8 +13,8 @@ export const test = base.extend<{
 
   authenticate: async ({ context }, use) => {
     await use(async () => {
-      if (!process.env.WP_USERNAME || !process.env.WP_PASSWORD) {
-        throw new Error('WP_USERNAME and WP_PASSWORD must be set in .env');
+      if (!process.env.WP_ADMIN_USER || !process.env.WP_ADMIN_PASSWORD) {
+        throw new Error('WP_ADMIN_USER and WP_ADMIN_PASSWORD must be set in .env');
       }
 
       const response = await context.request.post('http://localhost:8080/graphql', {
@@ -25,8 +25,8 @@ export const test = base.extend<{
             }
           }`,
           variables: {
-            username: process.env.WP_USERNAME,
-            password: process.env.WP_PASSWORD,
+            username: process.env.WP_ADMIN_USER,
+            password: process.env.WP_ADMIN_PASSWORD,
           },
         },
       });

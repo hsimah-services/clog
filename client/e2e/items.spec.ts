@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Items', () => {
-  test('lists seed items', async ({ page }) => {
+  test('lists seed items', async ({ page, waitForData }) => {
     await page.goto('/items');
+    await waitForData(page);
 
     await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Heinz Ketchup' })).toBeVisible();
@@ -10,8 +11,9 @@ test.describe('Items', () => {
     await expect(page.getByRole('link', { name: 'Wet Dog Food' })).toBeVisible();
   });
 
-  test('search filters items by name', async ({ page }) => {
+  test('search filters items by name', async ({ page, waitForData }) => {
     await page.goto('/items');
+    await waitForData(page);
 
     await page.getByPlaceholder('Search items...').fill('ketchup');
     await expect(page.getByRole('link', { name: 'Heinz Ketchup' })).toBeVisible();
@@ -19,26 +21,31 @@ test.describe('Items', () => {
     await expect(page.getByRole('link', { name: 'Wet Dog Food' })).not.toBeVisible();
   });
 
-  test('search shows no results message', async ({ page }) => {
+  test('search shows no results message', async ({ page, waitForData }) => {
     await page.goto('/items');
+    await waitForData(page);
 
     await page.getByPlaceholder('Search items...').fill('nonexistent item xyz');
     await expect(page.getByText('No items found')).toBeVisible();
   });
 
-  test('creates a new item', async ({ page }) => {
+  test('creates a new item', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items/new');
+    await waitForData(page);
 
     await page.getByLabel('Name').fill('Canned Beans');
     await page.getByRole('button', { name: 'Create' }).click();
 
-    // Should redirect to the new item detail page (shown in side panel)
-    await expect(page).toHaveURL(/\/items\/.+/);
+    // Should redirect to the new item detail page (numeric WordPress ID)
+    await expect(page).toHaveURL(/\/items\/\d+$/);
     await expect(page.getByRole('heading', { name: 'Canned Beans' })).toBeVisible();
   });
 
-  test('creates a new item with barcode and default expiry', async ({ page }) => {
+  test('creates a new item with barcode and default expiry', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items/new');
+    await waitForData(page);
 
     await page.getByLabel('Name').fill('Milk');
     await page.getByRole('button', { name: 'Set manually' }).click();
@@ -50,16 +57,17 @@ test.describe('Items', () => {
 
     await page.getByRole('button', { name: 'Create' }).click();
 
-    await expect(page).toHaveURL(/\/items\/.+/);
+    await expect(page).toHaveURL(/\/items\/\d+$/);
     await expect(page.getByRole('heading', { name: 'Milk' })).toBeVisible();
   });
 
-  test('navigates to item detail page', async ({ page }) => {
+  test('navigates to item detail page', async ({ page, waitForData }) => {
     await page.goto('/items');
+    await waitForData(page);
 
     await page.getByRole('link', { name: 'Heinz Ketchup' }).click();
 
-    await expect(page).toHaveURL(/\/items\/item-1$/);
+    await expect(page).toHaveURL(/\/items\/\d+$/);
     await expect(page.getByRole('heading', { name: 'Heinz Ketchup' })).toBeVisible();
   });
 });

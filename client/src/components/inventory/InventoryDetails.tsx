@@ -16,8 +16,8 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
   const item = getItem(inventory.itemId);
   const location = getLocation(inventory.locationId);
 
-  const handleDelete = () => {
-    deleteInventory(inventory.id);
+  const handleDelete = async () => {
+    await deleteInventory(inventory.id);
     navigate('/inventory');
   };
 

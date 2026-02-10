@@ -5,8 +5,12 @@ import { useData } from '@/context/DataContext';
 
 export function ItemPage() {
   const { id } = useParams<{ id: string }>();
-  const { getItem } = useData();
+  const { getItem, loading } = useData();
   const item = id ? getItem(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!item) {
     return <div className="text-muted-foreground">Item not found</div>;
@@ -21,8 +25,12 @@ export function ItemPage() {
 
 export function EditItemPage() {
   const { id } = useParams<{ id: string }>();
-  const { getItem } = useData();
+  const { getItem, loading } = useData();
   const item = id ? getItem(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!item) {
     return <div className="text-muted-foreground">Item not found</div>;

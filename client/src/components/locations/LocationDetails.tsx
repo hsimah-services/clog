@@ -14,8 +14,8 @@ export function LocationDetails({ location }: LocationDetailsProps) {
   const { deleteLocation } = useData();
 
   const { onClose } = useOutletContext<{ onClose?: () => void }>();
-  const handleDelete = () => {
-    deleteLocation(location.id);
+  const handleDelete = async () => {
+    await deleteLocation(location.id);
     navigate('/locations');
   };
 

@@ -17,13 +17,13 @@ export function ItemDetails({ item }: ItemDetailsProps) {
   const { onClose } = useOutletContext<{ onClose?: () => void }>();
   const [scannerOpen, setScannerOpen] = useState(false);
 
-  const handleDelete = () => {
-    deleteItem(item.id);
+  const handleDelete = async () => {
+    await deleteItem(item.id);
     navigate('/items');
   };
 
-  const handleScanBarcode = (barcode: string) => {
-    updateItem(item.id, { barcodes: [...item.barcodes, barcode] });
+  const handleScanBarcode = async (barcode: string) => {
+    await updateItem(item.id, { barcodes: [...item.barcodes, barcode] });
   };
 
   return (

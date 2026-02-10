@@ -50,6 +50,7 @@ services:
         define('WP_REDIS_HOST', '${REDIS_HOST}');
         define('WP_REDIS_PORT', ${REDIS_PORT});
         define('WP_CACHE', true);
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${GRAPHQL_JWT_AUTH_SECRET_KEY}');
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -83,8 +84,7 @@ services:
       - ./client/src:/app/src
       - ./client/public:/app/public
     environment:
-      NEXT_PUBLIC_WORDPRESS_URL: http://localhost:8080
-      WORDPRESS_GRAPHQL_URL: http://wordpress:80/graphql
+      VITE_GRAPHQL_URL: http://localhost:8080/graphql
 
 volumes:
   db_data:

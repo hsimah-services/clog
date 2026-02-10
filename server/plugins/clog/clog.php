@@ -17,3 +17,4 @@ require_once CLOG_PLUGIN_DIR . 'includes/post-types.php';
 require_once CLOG_PLUGIN_DIR . 'includes/meta-fields.php';
 require_once CLOG_PLUGIN_DIR . 'includes/graphql.php';
 require_once CLOG_PLUGIN_DIR . 'includes/admin-menu.php';
+require_once CLOG_PLUGIN_DIR . 'includes/seed-data.php';

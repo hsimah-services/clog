@@ -41,10 +41,10 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
 
   const isEditing = !!inventory;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      updateInventory(inventory.id, {
+      await updateInventory(inventory.id, {
         dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
       });
       navigate(`/inventory/${inventory.id}`);
@@ -55,7 +55,7 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
         dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
         dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
       };
-      const newInventory = addInventory(data);
+      const newInventory = await addInventory(data);
       navigate(`/inventory/${newInventory.id}`);
     }
   };

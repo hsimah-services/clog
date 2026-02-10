@@ -7,10 +7,19 @@ RUN apt-get update && apt-get install -y curl unzip ca-certificates && rm -rf /v
 # Install PHP Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
 
+# Install WP-CLI
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x /usr/local/bin/wp
+
 # Download and install WPGraphQL plugin
 RUN curl -L -o /tmp/wp-graphql.zip https://downloads.wordpress.org/plugin/wp-graphql.latest-stable.zip \
     && unzip /tmp/wp-graphql.zip -d /usr/src/wordpress/wp-content/plugins/ \
     && rm /tmp/wp-graphql.zip
+
+# Download and install WPGraphQL JWT Authentication plugin
+RUN curl -L -o /tmp/wp-graphql-jwt-auth.zip https://github.com/wp-graphql/wp-graphql-jwt-authentication/archive/refs/tags/v0.7.0.zip \
+    && unzip /tmp/wp-graphql-jwt-auth.zip -d /usr/src/wordpress/wp-content/plugins/ \
+    && rm /tmp/wp-graphql-jwt-auth.zip
 
 # Download and install WP Redis plugin
 RUN curl -L -o /tmp/wp-redis.zip https://downloads.wordpress.org/plugin/wp-redis.latest-stable.zip \
@@ -22,3 +31,9 @@ COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # Copy Redis object cache drop-in
 COPY object-cache.php /usr/src/wordpress/wp-content/object-cache.php
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/clog-entrypoint.sh
+RUN chmod +x /usr/local/bin/clog-entrypoint.sh
+
+CMD ["clog-entrypoint.sh"]

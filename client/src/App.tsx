@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ApolloProvider } from '@apollo/client/react';
+import { client } from '@/lib/apollo';
 import { DataProvider } from '@/context/DataContext';
 import { Layout } from '@/components/layout/Layout';
 import { HomePage } from '@/pages/HomePage';
@@ -14,6 +16,7 @@ import { InventoryItemPage, EditInventoryPage } from '@/pages/inventory/Inventor
 
 function App() {
   return (
+    <ApolloProvider client={client}>
     <DataProvider>
       <BrowserRouter>
         <Layout>
@@ -38,6 +41,7 @@ function App() {
         </Layout>
       </BrowserRouter>
     </DataProvider>
+    </ApolloProvider>
   );
 }
 

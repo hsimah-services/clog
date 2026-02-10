@@ -4,7 +4,15 @@ import { Button } from '@/components/ui/Button';
 import { useData } from '@/context/DataContext';
 
 export function HomePage() {
-  const { items, locations, inventory } = useData();
+  const { items, locations, inventory, loading, error } = useData();
+
+  if (loading) {
+    return <p className="text-muted-foreground">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-destructive">Error loading data: {error.message}</p>;
+  }
 
   return (
     <div className="space-y-6">

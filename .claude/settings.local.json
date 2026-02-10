@@ -12,7 +12,8 @@
       "Bash(npx playwright test:*)",
       "WebSearch",
       "Bash(npm run test:e2e:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(curl:*)"
     ]
   }
 }

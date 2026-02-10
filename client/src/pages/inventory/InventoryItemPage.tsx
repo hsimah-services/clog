@@ -5,8 +5,12 @@ import { useData } from '@/context/DataContext';
 
 export function InventoryItemPage() {
   const { id } = useParams<{ id: string }>();
-  const { getInventory } = useData();
+  const { getInventory, loading } = useData();
   const inventory = id ? getInventory(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!inventory) {
     return <div className="text-muted-foreground">Inventory entry not found</div>;
@@ -21,8 +25,12 @@ export function InventoryItemPage() {
 
 export function EditInventoryPage() {
   const { id } = useParams<{ id: string }>();
-  const { getInventory } = useData();
+  const { getInventory, loading } = useData();
   const inventory = id ? getInventory(id) : undefined;
+
+  if (loading) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   if (!inventory) {
     return <div className="text-muted-foreground">Inventory entry not found</div>;

@@ -1,14 +1,18 @@
 import React from 'react';
-import { HomePage } from '@/pages/HomePage';
-import { ItemsPage } from '@/pages/items/ItemsPage';
-import { NewItemPage } from '@/pages/items/NewItemPage';
-import { ItemPage, EditItemPage } from '@/pages/items/ItemPage';
-import { LocationsPage } from '@/pages/locations/LocationsPage';
-import { NewLocationPage } from '@/pages/locations/NewLocationPage';
-import { LocationPage, EditLocationPage } from '@/pages/locations/LocationPage';
-import { InventoryPage } from '@/pages/inventory/InventoryPage';
-import { NewInventoryPage } from '@/pages/inventory/NewInventoryPage';
-import { InventoryItemPage, EditInventoryPage } from '@/pages/inventory/InventoryItemPage';
+
+const HomePage = React.lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
+const ItemsPage = React.lazy(() => import('@/pages/items/ItemsPage').then(m => ({ default: m.ItemsPage })));
+const NewItemPage = React.lazy(() => import('@/pages/items/NewItemPage').then(m => ({ default: m.NewItemPage })));
+const ItemPage = React.lazy(() => import('@/pages/items/ItemPage').then(m => ({ default: m.ItemPage })));
+const EditItemPage = React.lazy(() => import('@/pages/items/ItemPage').then(m => ({ default: m.EditItemPage })));
+const LocationsPage = React.lazy(() => import('@/pages/locations/LocationsPage').then(m => ({ default: m.LocationsPage })));
+const NewLocationPage = React.lazy(() => import('@/pages/locations/NewLocationPage').then(m => ({ default: m.NewLocationPage })));
+const LocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.LocationPage })));
+const EditLocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.EditLocationPage })));
+const InventoryPage = React.lazy(() => import('@/pages/inventory/InventoryPage').then(m => ({ default: m.InventoryPage })));
+const NewInventoryPage = React.lazy(() => import('@/pages/inventory/NewInventoryPage').then(m => ({ default: m.NewInventoryPage })));
+const InventoryItemPage = React.lazy(() => import('@/pages/inventory/InventoryItemPage').then(m => ({ default: m.InventoryItemPage })));
+const EditInventoryPage = React.lazy(() => import('@/pages/inventory/InventoryItemPage').then(m => ({ default: m.EditInventoryPage })));
 
 export interface RouteChild {
   path: string;

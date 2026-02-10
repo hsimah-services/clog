@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { path: '/', label: 'Home' },
+  { path: '/home', label: 'Home' },
   { path: '/items', label: 'Items' },
   { path: '/locations', label: 'Locations' },
   { path: '/inventory', label: 'Inventory' },

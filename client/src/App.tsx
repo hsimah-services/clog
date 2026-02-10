@@ -17,30 +17,34 @@ import { InventoryItemPage, EditInventoryPage } from '@/pages/inventory/Inventor
 function App() {
   return (
     <ApolloProvider client={client}>
-    <DataProvider>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/items" element={<ItemsPage />}>
-              <Route path="new" element={<NewItemPage />} />
-              <Route path=":id" element={<ItemPage />} />
-              <Route path=":id/edit" element={<EditItemPage />} />
-            </Route>
-            <Route path="/locations" element={<LocationsPage />}>
-              <Route path="new" element={<NewLocationPage />} />
-              <Route path=":id" element={<LocationPage />} />
-              <Route path=":id/edit" element={<EditLocationPage />} />
-            </Route>
-            <Route path="/inventory" element={<InventoryPage />}>
-              <Route path="new" element={<NewInventoryPage />} />
-              <Route path=":id" element={<InventoryItemPage />} />
-              <Route path=":id/edit" element={<EditInventoryPage />} />
-            </Route>
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </DataProvider>
+      <DataProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<InventoryPage />}>
+                <Route path=":id" element={<InventoryItemPage />} />
+                <Route path=":id/edit" element={<EditInventoryPage />} />
+              </Route>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/items" element={<ItemsPage />}>
+                <Route path="new" element={<NewItemPage />} />
+                <Route path=":id" element={<ItemPage />} />
+                <Route path=":id/edit" element={<EditItemPage />} />
+              </Route>
+              <Route path="/locations" element={<LocationsPage />}>
+                <Route path="new" element={<NewLocationPage />} />
+                <Route path=":id" element={<LocationPage />} />
+                <Route path=":id/edit" element={<EditLocationPage />} />
+              </Route>
+              <Route path="/inventory" element={<InventoryPage />}>
+                <Route path="new" element={<NewInventoryPage />} />
+                <Route path=":id" element={<InventoryItemPage />} />
+                <Route path=":id/edit" element={<EditInventoryPage />} />
+              </Route>
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </DataProvider>
     </ApolloProvider>
   );
 }

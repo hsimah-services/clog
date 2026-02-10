@@ -55,9 +55,6 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
             <Button variant="destructive" onClick={handleDelete}>
               Delete
             </Button>
-            <Button variant="outline" onClick={() => navigate('/inventory')}>
-              Back to List
-            </Button>
           </div>
         </CardContent>
       }

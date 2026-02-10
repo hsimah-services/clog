@@ -37,9 +37,6 @@ export function LocationDetails({ location }: LocationDetailsProps) {
             <Button variant="destructive" onClick={handleDelete}>
               Delete
             </Button>
-            <Button variant="outline" onClick={() => navigate('/locations')}>
-              Back to List
-            </Button>
           </div>
         </CardContent>
       }

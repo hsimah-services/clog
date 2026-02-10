@@ -58,9 +58,6 @@ export function ItemDetails({ item }: ItemDetailsProps) {
               <Button variant="destructive" onClick={handleDelete}>
                 Delete
               </Button>
-              <Button variant="outline" onClick={() => navigate('/items')}>
-                Back to List
-              </Button>
             </div>
           </CardContent>
         }

@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Navigation', () => {
-  test('header navigation links work correctly', async ({ page }) => {
+  test('header navigation links work correctly', async ({ page, waitForData }) => {
     await page.goto('/');
+    await waitForData(page);
 
     // Navigate to Items
     await page.getByRole('navigation').getByRole('link', { name: 'Items' }).click();

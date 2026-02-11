@@ -16,23 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Docker Compose plugin
-        run: |
-          sudo apt-get install -y ca-certificates curl
-          sudo install -m 0755 -d /etc/apt/keyrings
-          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-          sudo chmod a+r /etc/apt/keyrings/docker.asc
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
-
       - name: Teardown previous run
         working-directory: .
-        run: sudo docker compose -f .docker/iditarod/test/docker-compose.yml down -v 2>/dev/null || true
+        run: docker compose -f .docker/iditarod/test/docker-compose.yml down -v 2>/dev/null || true
 
       - name: Start WordPress stack
         working-directory: .
-        run: sudo docker compose -f .docker/iditarod/test/docker-compose.yml up -d --build
+        run: docker compose -f .docker/iditarod/test/docker-compose.yml up -d --build
 
       - name: Wait for WordPress GraphQL
         working-directory: .
@@ -47,13 +37,13 @@ jobs:
             sleep 5
           done
           echo "WordPress failed to start"
-          sudo docker compose -f .docker/iditarod/test/docker-compose.yml logs wordpress
+          docker compose -f .docker/iditarod/test/docker-compose.yml logs wordpress
           exit 1
 
       - name: Seed test data
         working-directory: .
         run: >
-          sudo docker compose -f .docker/iditarod/test/docker-compose.yml
+          docker compose -f .docker/iditarod/test/docker-compose.yml
           exec -T wordpress wp clog seed --allow-root
 
       - name: Setup Node
@@ -86,4 +76,4 @@ jobs:
       - name: Teardown
         if: always()
         working-directory: .
-        run: sudo docker compose -f .docker/iditarod/test/docker-compose.yml down -v
+        run: docker compose -f .docker/iditarod/test/docker-compose.yml down -v

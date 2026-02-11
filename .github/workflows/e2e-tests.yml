@@ -33,7 +33,7 @@ jobs:
               echo "GraphQL is ready"
               exit 0
             fi
-            echo "Attempt $i/60 - waiting 5s..."
+            echo "Attempt $i/20 - waiting 5s..."
             sleep 5
           done
           echo "WordPress failed to start"

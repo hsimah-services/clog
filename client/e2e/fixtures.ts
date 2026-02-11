@@ -17,7 +17,8 @@ export const test = base.extend<{
         throw new Error('WP_ADMIN_USER and WP_ADMIN_PASSWORD must be set in .env');
       }
 
-      const response = await context.request.post('http://localhost:8080/graphql', {
+      const graphqlUrl = process.env.VITE_GRAPHQL_URL || 'http://localhost:8080/graphql';
+      const response = await context.request.post(graphqlUrl, {
         data: {
           query: `mutation Login($username: String!, $password: String!) {
             login(input: { username: $username, password: $password }) {

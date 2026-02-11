@@ -61,6 +61,7 @@ jobs:
 
       - name: Run Playwright tests
         env:
+          VITE_GRAPHQL_URL: http://localhost:6060/graphql
           WP_ADMIN_USER: testadmin
           WP_ADMIN_PASSWORD: testpassword
         run: npm run test:e2e

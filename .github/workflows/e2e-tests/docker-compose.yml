@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: "no"
+    env_file: .env.ci
+    tmpfs:
+      - /var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: "no"
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    build:
+      context: ../../../.docker/wordpress
+    restart: "no"
+    env_file: .env.ci
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "6060:80"
+    volumes:
+      - ../../../server/plugins/clog:/var/www/html/wp-content/plugins/clog
+    environment:
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', 'redis');
+        define('WP_REDIS_PORT', 6379);
+        define('WP_CACHE', true);
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', 'clog-ci-jwt-secret-key');

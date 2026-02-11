@@ -5,12 +5,26 @@ set -e
 docker-entrypoint.sh apache2-foreground &
 WP_PID=$!
 
-# Wait for WordPress to be ready
-echo "Waiting for WordPress to be ready..."
-until wp core is-installed --allow-root --quiet 2>/dev/null; do
+# Wait for WordPress files to be available
+echo "Waiting for WordPress files..."
+until wp core version --allow-root --quiet 2>/dev/null; do
   sleep 2
 done
-echo "WordPress is ready."
+echo "WordPress files are ready."
+
+# Install WordPress if not already installed (handles fresh databases in CI)
+if ! wp core is-installed --allow-root --quiet 2>/dev/null; then
+  echo "WordPress not installed — running wp core install..."
+  wp core install \
+    --url="${WP_URL:-http://localhost:8080}" \
+    --title="${WP_TITLE:-Clog}" \
+    --admin_user="${WP_ADMIN_USER:-admin}" \
+    --admin_password="${WP_ADMIN_PASSWORD:-admin}" \
+    --admin_email="${WP_ADMIN_EMAIL:-admin@localhost}" \
+    --skip-email \
+    --allow-root
+  echo "WordPress installed successfully."
+fi
 
 # Copy plugins from source to live directory if missing (handles persistent volumes)
 for plugin_dir in wp-graphql wp-graphql-jwt-authentication-0.7.0 wp-redis; do

@@ -1,0 +1,80 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: client
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Teardown previous run
+        working-directory: .
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v 2>/dev/null || true
+
+      - name: Start WordPress stack
+        working-directory: .
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml up -d --build
+
+      - name: Wait for WordPress setup
+        working-directory: .
+        run: |
+          echo "Waiting for WordPress and plugins..."
+          for i in $(seq 1 30); do
+            if docker compose -f .github/workflows/e2e-tests/docker-compose.yml exec -T wordpress wp plugin is-active clog --allow-root 2>/dev/null; then
+              echo "WordPress is ready and clog plugin is active"
+              exit 0
+            fi
+            echo "Attempt $i/30 - waiting 5s..."
+            sleep 5
+          done
+          echo "WordPress setup failed"
+          docker compose -f .github/workflows/e2e-tests/docker-compose.yml logs wordpress
+          exit 1
+
+      - name: Seed test data
+        working-directory: .
+        run: >
+          docker compose -f .github/workflows/e2e-tests/docker-compose.yml
+          exec -T wordpress wp clog seed --allow-root
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        env:
+          VITE_GRAPHQL_URL: http://localhost:6060/graphql
+          WP_ADMIN_USER: testadmin
+          WP_ADMIN_PASSWORD: testpassword
+        run: npm run test:e2e
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: client/playwright-report/
+          retention-days: 30
+
+      - name: Teardown
+        if: always()
+        working-directory: .
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v

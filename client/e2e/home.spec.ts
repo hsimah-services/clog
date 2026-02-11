@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 test.describe('Home Page', () => {
   test('displays welcome heading and seed data counts', async ({ page, waitForData }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await waitForData(page);
 
     await expect(page.getByRole('heading', { name: 'Welcome to Clog' })).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('Home Page', () => {
   });
 
   test('navigates to items page via View All button', async ({ page, waitForData }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await waitForData(page);
 
     await page.locator('a[href="/items"]:has-text("View All")').click();
@@ -30,7 +30,7 @@ test.describe('Home Page', () => {
   });
 
   test('navigates to locations page via View All button', async ({ page, waitForData }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await waitForData(page);
 
     await page.locator('a[href="/locations"]:has-text("View All")').click();
@@ -40,7 +40,7 @@ test.describe('Home Page', () => {
   });
 
   test('navigates to inventory page via View All button', async ({ page, waitForData }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await waitForData(page);
 
     await page.locator('a[href="/inventory"]:has-text("View All")').click();

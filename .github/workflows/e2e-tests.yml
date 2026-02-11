@@ -18,18 +18,18 @@ jobs:
 
       - name: Teardown previous run
         working-directory: .
-        run: docker compose -f ./e2e-tests/docker-compose.yml down -v 2>/dev/null || true
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v 2>/dev/null || true
 
       - name: Start WordPress stack
         working-directory: .
-        run: docker compose -f ./e2e-tests/docker-compose.yml up -d --build
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml up -d --build
 
       - name: Wait for WordPress setup
         working-directory: .
         run: |
           echo "Waiting for WordPress and plugins..."
           for i in $(seq 1 30); do
-            if docker compose -f ./e2e-tests/docker-compose.yml exec -T wordpress wp plugin is-active clog --allow-root 2>/dev/null; then
+            if docker compose -f .github/workflows/e2e-tests/docker-compose.yml exec -T wordpress wp plugin is-active clog --allow-root 2>/dev/null; then
               echo "WordPress is ready and clog plugin is active"
               exit 0
             fi
@@ -37,13 +37,13 @@ jobs:
             sleep 5
           done
           echo "WordPress setup failed"
-          docker compose -f ./e2e-tests/docker-compose.yml logs wordpress
+          docker compose -f .github/workflows/e2e-tests/docker-compose.yml logs wordpress
           exit 1
 
       - name: Seed test data
         working-directory: .
         run: >
-          docker compose -f ./e2e-tests/docker-compose.yml
+          docker compose -f .github/workflows/e2e-tests/docker-compose.yml
           exec -T wordpress wp clog seed --allow-root
 
       - name: Setup Node
@@ -77,4 +77,4 @@ jobs:
       - name: Teardown
         if: always()
         working-directory: .
-        run: docker compose -f ./e2e-tests/docker-compose.yml down -v
+        run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v

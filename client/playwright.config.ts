@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 dotenv.config({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.env') });
 
 export default defineConfig({
+  globalTeardown: './e2e/global-teardown.ts',
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

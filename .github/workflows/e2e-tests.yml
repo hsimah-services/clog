@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Waiting for GraphQL endpoint..."
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null http://localhost:8080/graphql; then
+            if curl -sf -o /dev/null http://localhost:6060/graphql; then
               echo "GraphQL is ready"
               exit 0
             fi

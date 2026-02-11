@@ -35,7 +35,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "8080:80"
+      - "6060:80"
     volumes:
       - ../../../server/plugins/clog:/var/www/html/wp-content/plugins/clog
     environment:

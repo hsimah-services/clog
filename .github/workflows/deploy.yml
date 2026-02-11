@@ -1,0 +1,60 @@
+name: Deploy on Release Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build
+        env:
+          VITE_GRAPHQL_URL: /graphql
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: client/dist/
+          retention-days: 30
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: .docker/client/dist/
+
+      - name: Build client image
+        run: docker compose -f docker-compose.prod.yml build client
+
+      - name: Deploy client
+        run: docker compose -f docker-compose.prod.yml up -d client
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl -f http://localhost/ || exit 1
+
+      - name: Clean up old images
+        run: docker image prune -f

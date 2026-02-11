@@ -34,6 +34,7 @@ dist-ssr
 
 # Environment
 .env
+.env.prod
 
 # Docker volumes
 db_data/

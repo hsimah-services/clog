@@ -26,6 +26,8 @@ jobs:
       - run: npm run lint
 
       - run: npm run build
+        env:
+          VITE_GRAPHQL_URL: /graphql
 
       - uses: actions/upload-artifact@v4
         with:

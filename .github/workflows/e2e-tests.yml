@@ -40,6 +40,12 @@ jobs:
           docker compose -f .docker/iditarod/test/docker-compose.yml logs wordpress
           exit 1
 
+      - name: Activate plugins
+        working-directory: .
+        run: >
+          docker compose -f .docker/iditarod/test/docker-compose.yml
+          exec -T wordpress wp plugin activate --all --allow-root
+
       - name: Seed test data
         working-directory: .
         run: >

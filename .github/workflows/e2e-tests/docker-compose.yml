@@ -2,7 +2,7 @@ services:
   db:
     image: mysql:8.0
     restart: "no"
-    env_file: ../../../.env.ci
+    env_file: .env.ci
     tmpfs:
       - /var/lib/mysql
     ports:
@@ -28,7 +28,7 @@ services:
     build:
       context: ../../../docker/wordpress
     restart: "no"
-    env_file: ../../../.env.ci
+    env_file: .env.ci
     depends_on:
       db:
         condition: service_healthy

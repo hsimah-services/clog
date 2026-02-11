@@ -26,7 +26,7 @@ services:
 
   wordpress:
     build:
-      context: docker/wordpress
+      context: ../../../docker/wordpress
     restart: "no"
     env_file: .env.ci
     depends_on:
@@ -37,7 +37,7 @@ services:
     ports:
       - "6060:80"
     volumes:
-      - server/plugins/clog:/var/www/html/wp-content/plugins/clog
+      - ../../../server/plugins/clog:/var/www/html/wp-content/plugins/clog
     environment:
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_REDIS_HOST', 'redis');

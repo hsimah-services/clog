@@ -1,27 +1,57 @@
 name: Deploy Clog Plugin to Pupyrus
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
 jobs:
-  deploy:
-    if: github.event.release.tag_name == 'deploy@pupyrus'
-    runs-on: self-hosted
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
     steps:
       - uses: actions/checkout@v4
 
-      - name: Package plugin
-        run: cd server/plugins && zip -r ../../clog.zip clog/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build
+        env:
+          VITE_GRAPHQL_URL: /graphql
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: client/dist/
+
+  deploy:
+    runs-on: [self-hosted, space-needle]
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: server/plugins/clog/dist/
+
+      - name: Remove old plugin from container
+        run: docker exec pupyrus rm -rf /var/www/html/wp-content/plugins/clog
 
       - name: Copy plugin to container
-        run: docker cp clog.zip pupyrus:/tmp/clog.zip
+        run: docker cp server/plugins/clog pupyrus:/var/www/html/wp-content/plugins/clog
 
-      - name: Install and activate plugin
-        run: docker exec pupyrus wp plugin install /tmp/clog.zip --activate --force --allow-root
-
-      - name: Clean up
-        run: docker exec pupyrus rm /tmp/clog.zip
+      - name: Activate plugin
+        run: docker exec pupyrus wp plugin activate clog --allow-root
 
       - name: Verify plugin status
         run: docker exec pupyrus wp plugin status clog --allow-root

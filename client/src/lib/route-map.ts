@@ -16,14 +16,14 @@ const EditInventoryPage = React.lazy(() => import('@/pages/inventory/InventoryIt
 
 export interface RouteChild {
   path: string;
-  element: React.ComponentType<any>;
+  element: React.ComponentType;
   label?: string;
 }
 
 export interface RouteConfig {
   path: string;
   label?: string;
-  element: React.ComponentType<any>;
+  element: React.ComponentType;
   children?: RouteChild[];
 }
 

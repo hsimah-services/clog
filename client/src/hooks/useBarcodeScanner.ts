@@ -31,6 +31,7 @@ export function useBarcodeScanner({ onDetected, formats }: UseBarcodeSccannerOpt
     const video = videoRef.current;
     const detector = detectorRef.current;
     if (!video || !detector || video.readyState < 2) {
+      // eslint-disable-next-line react-hooks/immutability
       rafRef.current = requestAnimationFrame(detect);
       return;
     }

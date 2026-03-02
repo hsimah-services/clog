@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';

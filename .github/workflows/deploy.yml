@@ -32,6 +32,7 @@ jobs:
         with:
           name: dist
           path: client/dist/
+          include-hidden-files: true
 
   deploy:
     runs-on: [self-hosted, space-needle]

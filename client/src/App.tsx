@@ -10,7 +10,7 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <DataProvider>
-        <BrowserRouter>
+        <BrowserRouter basename='/clog'>
           <Layout>
             <Suspense fallback={<div className="p-4">Loading...</div>}>
               <Routes>

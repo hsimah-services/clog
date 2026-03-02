@@ -51,7 +51,11 @@ jobs:
         run: docker cp server/plugins/clog pupyrus:/var/www/html/wp-content/plugins/clog
 
       - name: Activate plugin
-        run: docker exec pupyrus wp plugin activate clog --allow-root
+        run: |
+          docker compose -f /home/hsimah/projects/space-needle/pupyrus/docker-compose.yml \
+            --profile cli run --rm cli wp plugin activate clog --allow-root
 
       - name: Verify plugin status
-        run: docker exec pupyrus wp plugin status clog --allow-root
+        run: |
+          docker compose -f /home/hsimah/projects/space-needle/pupyrus/docker-compose.yml \
+            --profile cli run --rm cli wp plugin status clog --allow-root

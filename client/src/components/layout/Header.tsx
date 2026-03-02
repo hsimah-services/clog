@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { navItems } from '@/lib/route-map';
+import clogLogo from '/clog.png';
 
 export function Header() {
   const location = useLocation();
@@ -10,7 +11,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/clog.png" className="h-8 w-8" alt="Clog logo" />
+            <img src={clogLogo} className="h-8 w-8" alt="Clog logo" />
             <Link to="/" className="text-xl font-bold">
               clog
             </Link></div>

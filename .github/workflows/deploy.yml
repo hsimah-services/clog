@@ -55,6 +55,11 @@ jobs:
           docker compose -f /opt/pupyrus/docker-compose.yml \
             --profile cli run --rm cli wp plugin activate clog --allow-root
 
+      - name: Flush rewrite rules
+        run: |
+          docker compose -f /opt/pupyrus/docker-compose.yml \
+            --profile cli run --rm cli wp rewrite flush --allow-root
+
       - name: Verify plugin status
         run: |
           docker compose -f /opt/pupyrus/docker-compose.yml \

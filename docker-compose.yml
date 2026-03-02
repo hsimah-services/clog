@@ -39,6 +39,7 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ./server/plugins/clog:/var/www/html/wp-content/plugins/clog
+      - ./client/dist:/var/www/html/wp-content/plugins/clog/dist
       - ./server/themes:/var/www/html/wp-content/themes/custom
     environment:
       WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}

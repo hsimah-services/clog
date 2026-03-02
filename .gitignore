@@ -38,3 +38,4 @@ dist-ssr
 
 # Docker volumes
 db_data/
+client/tsconfig.e2e.tsbuildinfo

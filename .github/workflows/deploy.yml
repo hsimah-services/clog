@@ -1,6 +1,7 @@
 name: Deploy Clog Plugin to Pupyrus
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 

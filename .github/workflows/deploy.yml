@@ -33,7 +33,7 @@ jobs:
           path: client/dist/
 
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, space-needle]
     needs: build
     steps:
       - uses: actions/checkout@v4

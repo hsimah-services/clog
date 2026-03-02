@@ -52,10 +52,10 @@ jobs:
 
       - name: Activate plugin
         run: |
-          docker compose -f /home/hsimah/projects/space-needle/pupyrus/docker-compose.yml \
+          docker compose -f /opt/pupyrus/docker-compose.yml \
             --profile cli run --rm cli wp plugin activate clog --allow-root
 
       - name: Verify plugin status
         run: |
-          docker compose -f /home/hsimah/projects/space-needle/pupyrus/docker-compose.yml \
+          docker compose -f /opt/pupyrus/docker-compose.yml \
             --profile cli run --rm cli wp plugin status clog --allow-root

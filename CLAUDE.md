@@ -3,6 +3,11 @@
 ## Project Overview
 Clog (Cave Log) is a React + TypeScript inventory management system for tracking items, locations, and inventory quantities.
 
+## Deployment
+
+- **space-needle**: The production home server running a self-hosted GitHub Actions runner
+- **pupyrus**: The WordPress Docker container running on space-needle, deployed via `deploy@pupyrus` release tags
+
 ## Code Organization
 
 ### Directory Structure

@@ -1,0 +1,27 @@
+name: Deploy Clog Plugin to Pupyrus
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    if: github.event.release.tag_name == 'deploy@pupyrus'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package plugin
+        run: cd server/plugins && zip -r ../../clog.zip clog/
+
+      - name: Copy plugin to container
+        run: docker cp clog.zip pupyrus:/tmp/clog.zip
+
+      - name: Install and activate plugin
+        run: docker exec pupyrus wp plugin install /tmp/clog.zip --activate --force --allow-root
+
+      - name: Clean up
+        run: docker exec pupyrus rm /tmp/clog.zip
+
+      - name: Verify plugin status
+        run: docker exec pupyrus wp plugin status clog --allow-root

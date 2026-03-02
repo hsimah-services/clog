@@ -46,16 +46,6 @@ services:
         define('WP_CACHE', true);
         define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${GRAPHQL_JWT_AUTH_SECRET_KEY}');
 
-  client:
-    build:
-      context: ./.docker/client
-      dockerfile: Dockerfile.prod
-    restart: unless-stopped
-    depends_on:
-      - wordpress
-    ports:
-      - "80:80"
-
 volumes:
   db_data:
   wp_data:

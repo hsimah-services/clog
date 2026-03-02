@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
 
 interface BarcodeScannerDialogProps {

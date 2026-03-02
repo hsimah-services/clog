@@ -81,7 +81,7 @@ Rules:
 Always use the `@/` alias for imports:
 ```tsx
 // ✅ Correct
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { useData } from '@/context/DataContext';
 import { cn } from '@/lib/utils';
 
@@ -101,7 +101,7 @@ Example:
 ```tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ItemForm } from '@/components/items/ItemForm';
 import { useData } from '@/context/DataContext';

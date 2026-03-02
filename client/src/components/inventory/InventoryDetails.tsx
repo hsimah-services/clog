@@ -1,5 +1,5 @@
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';

@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    if: github.event.release.tag_name == 'deploy@pupyrus'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,7 +33,6 @@ jobs:
           path: client/dist/
 
   deploy:
-    if: github.event.release.tag_name == 'deploy@pupyrus'
     runs-on: self-hosted
     needs: build
     steps:

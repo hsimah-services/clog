@@ -1,60 +1,27 @@
-name: Deploy on Release Tag
+name: Deploy Clog Plugin to Pupyrus
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: client/package-lock.json
-
-      - run: npm ci
-
-      - run: npm run lint
-
-      - run: npm run build
-        env:
-          VITE_GRAPHQL_URL: /graphql
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: client/dist/
-          retention-days: 30
-
   deploy:
+    if: github.event.release.tag_name == 'deploy@pupyrus'
     runs-on: self-hosted
-    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: .docker/client/dist/
+      - name: Package plugin
+        run: cd server/plugins && zip -r ../../clog.zip clog/
 
-      - name: Build client image
-        run: docker compose -f docker-compose.prod.yml build client
+      - name: Copy plugin to container
+        run: docker cp clog.zip pupyrus:/tmp/clog.zip
 
-      - name: Deploy client
-        run: docker compose -f docker-compose.prod.yml up -d client
+      - name: Install and activate plugin
+        run: docker exec pupyrus wp plugin install /tmp/clog.zip --activate --force --allow-root
 
-      - name: Health check
-        run: |
-          sleep 5
-          curl -f http://localhost/ || exit 1
+      - name: Clean up
+        run: docker exec pupyrus rm /tmp/clog.zip
 
-      - name: Clean up old images
-        run: docker image prune -f
+      - name: Verify plugin status
+        run: docker exec pupyrus wp plugin status clog --allow-root

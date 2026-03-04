@@ -21,6 +21,9 @@ function clog_register_meta_fields(): void {
 				'items' => [ 'type' => 'string' ],
 			],
 		],
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	register_post_meta( 'clog_item', 'clog_default_expiry_unit', [
@@ -28,6 +31,9 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Default expiry unit (days or months)',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	register_post_meta( 'clog_item', 'clog_default_expiry_value', [
@@ -35,6 +41,9 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Default expiry value',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	// Inventory meta fields
@@ -43,6 +52,9 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Referenced Item post ID',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	register_post_meta( 'clog_inventory', 'clog_location_id', [
@@ -50,6 +62,9 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Referenced Location post ID',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	register_post_meta( 'clog_inventory', 'clog_date_added', [
@@ -57,6 +72,9 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Date the item was added to inventory (ISO 8601)',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 
 	register_post_meta( 'clog_inventory', 'clog_date_expiry', [
@@ -64,5 +82,8 @@ function clog_register_meta_fields(): void {
 		'description'   => 'Expiry date (ISO 8601), empty if no expiry',
 		'single'        => true,
 		'show_in_rest'  => true,
+		'auth_callback' => function() {
+			return current_user_can( 'edit_posts' );
+		},
 	] );
 }

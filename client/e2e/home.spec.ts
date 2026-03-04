@@ -1,7 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Home Page', () => {
-  test('displays welcome heading and seed data counts', async ({ page, waitForData }) => {
+  test('displays welcome heading and seed data counts', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/home');
     await waitForData(page);
 
@@ -19,7 +20,8 @@ test.describe('Home Page', () => {
     await expect(inventoryCard.getByText('Total items in stock')).toBeVisible();
   });
 
-  test('navigates to items page via View All button', async ({ page, waitForData }) => {
+  test('navigates to items page via View All button', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/home');
     await waitForData(page);
 
@@ -29,7 +31,8 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
   });
 
-  test('navigates to locations page via View All button', async ({ page, waitForData }) => {
+  test('navigates to locations page via View All button', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/home');
     await waitForData(page);
 
@@ -39,7 +42,8 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('heading', { name: 'Locations' })).toBeVisible();
   });
 
-  test('navigates to inventory page via View All button', async ({ page, waitForData }) => {
+  test('navigates to inventory page via View All button', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/home');
     await waitForData(page);
 

@@ -1,7 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Navigation', () => {
-  test('header navigation links work correctly', async ({ page, waitForData }) => {
+  test('header navigation links work correctly', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/');
     await waitForData(page);
 

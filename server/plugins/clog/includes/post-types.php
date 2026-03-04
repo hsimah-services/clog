@@ -23,9 +23,13 @@ function clog_register_post_types(): void {
 			'not_found'          => __( 'No items found', 'clog' ),
 			'not_found_in_trash' => __( 'No items found in Trash', 'clog' ),
 		],
-		'public'       => true,
-		'show_ui'      => true,
-		'show_in_rest' => true,
+		'public'              => false,
+		'show_ui'             => true,
+		'show_in_rest'        => true,
+		'publicly_queryable'  => false,
+		'exclude_from_search' => true,
+		'capability_type'     => [ 'clog_entry', 'clog_entries' ],
+		'map_meta_cap'        => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
 		'show_in_graphql'    => true,
@@ -46,9 +50,13 @@ function clog_register_post_types(): void {
 			'not_found'          => __( 'No locations found', 'clog' ),
 			'not_found_in_trash' => __( 'No locations found in Trash', 'clog' ),
 		],
-		'public'       => true,
-		'show_ui'      => true,
-		'show_in_rest' => true,
+		'public'              => false,
+		'show_ui'             => true,
+		'show_in_rest'        => true,
+		'publicly_queryable'  => false,
+		'exclude_from_search' => true,
+		'capability_type'     => [ 'clog_entry', 'clog_entries' ],
+		'map_meta_cap'        => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
 		'show_in_graphql'    => true,
@@ -69,13 +77,76 @@ function clog_register_post_types(): void {
 			'not_found'          => __( 'No inventory entries found', 'clog' ),
 			'not_found_in_trash' => __( 'No inventory entries found in Trash', 'clog' ),
 		],
-		'public'       => true,
-		'show_ui'      => true,
-		'show_in_rest' => true,
+		'public'              => false,
+		'show_ui'             => true,
+		'show_in_rest'        => true,
+		'publicly_queryable'  => false,
+		'exclude_from_search' => true,
+		'capability_type'     => [ 'clog_entry', 'clog_entries' ],
+		'map_meta_cap'        => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
 		'show_in_graphql'    => true,
 		'graphql_single_name' => 'ClogInventory',
 		'graphql_plural_name' => 'ClogInventoryEntries',
 	] );
+}
+
+/**
+ * Grant Clog capabilities to roles on plugin activation.
+ */
+function clog_add_role_caps(): void {
+	$author_caps = [
+		'edit_clog_entries',
+		'edit_published_clog_entries',
+		'publish_clog_entries',
+		'delete_clog_entries',
+		'delete_published_clog_entries',
+	];
+
+	$editor_caps = array_merge( $author_caps, [
+		'edit_others_clog_entries',
+		'edit_private_clog_entries',
+		'delete_others_clog_entries',
+		'delete_private_clog_entries',
+		'read_private_clog_entries',
+	] );
+
+	foreach ( [ 'author' => $author_caps, 'editor' => $editor_caps, 'administrator' => $editor_caps ] as $role_name => $caps ) {
+		$role = get_role( $role_name );
+		if ( ! $role ) {
+			continue;
+		}
+		foreach ( $caps as $cap ) {
+			$role->add_cap( $cap );
+		}
+	}
+}
+
+/**
+ * Remove Clog capabilities from roles on plugin deactivation.
+ */
+function clog_remove_role_caps(): void {
+	$all_caps = [
+		'edit_clog_entries',
+		'edit_published_clog_entries',
+		'edit_others_clog_entries',
+		'edit_private_clog_entries',
+		'publish_clog_entries',
+		'delete_clog_entries',
+		'delete_published_clog_entries',
+		'delete_others_clog_entries',
+		'delete_private_clog_entries',
+		'read_private_clog_entries',
+	];
+
+	foreach ( [ 'author', 'editor', 'administrator' ] as $role_name ) {
+		$role = get_role( $role_name );
+		if ( ! $role ) {
+			continue;
+		}
+		foreach ( $all_caps as $cap ) {
+			$role->remove_cap( $cap );
+		}
+	}
 }

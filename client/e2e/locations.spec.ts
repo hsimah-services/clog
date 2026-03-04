@@ -1,7 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Locations', () => {
-  test('lists seed locations', async ({ page, waitForData }) => {
+  test('lists seed locations', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/locations');
     await waitForData(page);
 
@@ -12,7 +13,8 @@ test.describe('Locations', () => {
     await expect(page.getByRole('link', { name: 'Kitchen Freezer' })).toBeVisible();
   });
 
-  test('search filters locations', async ({ page, waitForData }) => {
+  test('search filters locations', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/locations');
     await waitForData(page);
 
@@ -23,7 +25,8 @@ test.describe('Locations', () => {
     await expect(page.getByRole('link', { name: 'Kitchen Freezer' })).not.toBeVisible();
   });
 
-  test('search shows no results message', async ({ page, waitForData }) => {
+  test('search shows no results message', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/locations');
     await waitForData(page);
 
@@ -44,7 +47,8 @@ test.describe('Locations', () => {
     await expect(page.getByRole('heading', { name: 'Basement Shelf' })).toBeVisible();
   });
 
-  test('navigates to location detail page', async ({ page, waitForData }) => {
+  test('navigates to location detail page', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/locations');
     await waitForData(page);
 

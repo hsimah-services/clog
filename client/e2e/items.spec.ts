@@ -1,7 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Items', () => {
-  test('lists seed items', async ({ page, waitForData }) => {
+  test('lists seed items', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items');
     await waitForData(page);
 
@@ -11,7 +12,8 @@ test.describe('Items', () => {
     await expect(page.getByRole('link', { name: 'Wet Dog Food' })).toBeVisible();
   });
 
-  test('search filters items by name', async ({ page, waitForData }) => {
+  test('search filters items by name', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items');
     await waitForData(page);
 
@@ -21,7 +23,8 @@ test.describe('Items', () => {
     await expect(page.getByRole('link', { name: 'Wet Dog Food' })).not.toBeVisible();
   });
 
-  test('search shows no results message', async ({ page, waitForData }) => {
+  test('search shows no results message', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items');
     await waitForData(page);
 
@@ -61,7 +64,8 @@ test.describe('Items', () => {
     await expect(page.getByRole('heading', { name: 'Milk' })).toBeVisible();
   });
 
-  test('navigates to item detail page', async ({ page, waitForData }) => {
+  test('navigates to item detail page', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/items');
     await waitForData(page);
 

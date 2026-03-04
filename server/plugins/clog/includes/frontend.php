@@ -29,6 +29,10 @@ add_filter( 'query_vars', 'clog_query_vars' );
  */
 function clog_template_include( $template ) {
 	if ( get_query_var( 'clog_app' ) ) {
+		if ( ! is_user_logged_in() ) {
+			auth_redirect();
+			exit;
+		}
 		return CLOG_PLUGIN_DIR . 'templates/app.php';
 	}
 	return $template;

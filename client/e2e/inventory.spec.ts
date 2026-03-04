@@ -1,7 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Inventory', () => {
-  test('lists seed inventory grouped by item', async ({ page, waitForData }) => {
+  test('lists seed inventory grouped by item', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/inventory');
     await waitForData(page);
 
@@ -11,7 +12,8 @@ test.describe('Inventory', () => {
     await expect(page.getByRole('link', { name: 'Wet Dog Food' })).toBeVisible();
   });
 
-  test('search filters inventory', async ({ page, waitForData }) => {
+  test('search filters inventory', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/inventory');
     await waitForData(page);
 
@@ -20,7 +22,8 @@ test.describe('Inventory', () => {
     await expect(page.getByRole('link', { name: 'Dry Dog Food' })).not.toBeVisible();
   });
 
-  test('expands item row to show location breakdown', async ({ page, waitForData }) => {
+  test('expands item row to show location breakdown', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/inventory');
     await waitForData(page);
 
@@ -33,7 +36,8 @@ test.describe('Inventory', () => {
     await expect(page.locator('tr.bg-muted\\/50').filter({ hasText: 'Garage Shelves' })).toBeVisible();
   });
 
-  test('shows no results message for empty search', async ({ page, waitForData }) => {
+  test('shows no results message for empty search', async ({ page, waitForData, authenticate }) => {
+    await authenticate();
     await page.goto('/inventory');
     await waitForData(page);
 

@@ -13,7 +13,7 @@ function clog_register_admin_menu(): void {
 	add_menu_page(
 		__( 'Clog', 'clog' ),
 		__( 'Clog', 'clog' ),
-		'edit_posts',
+		'edit_clog_entries',
 		'clog',
 		'clog_render_landing_page',
 		'dashicons-archive',

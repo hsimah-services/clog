@@ -69,11 +69,13 @@ function clog_get_vite_assets() {
 function clog_activate() {
 	clog_rewrite_rules();
 	flush_rewrite_rules();
+	clog_add_role_caps();
 }
 
 /**
- * Flush rewrite rules on plugin deactivation.
+ * Flush rewrite rules and remove custom capabilities on plugin deactivation.
  */
 function clog_deactivate() {
 	flush_rewrite_rules();
+	clog_remove_role_caps();
 }

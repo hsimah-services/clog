@@ -22,7 +22,7 @@ function clog_register_meta_fields(): void {
 			],
 		],
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -32,7 +32,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -42,7 +42,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -53,7 +53,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -63,7 +63,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -73,7 +73,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 
@@ -83,7 +83,7 @@ function clog_register_meta_fields(): void {
 		'single'        => true,
 		'show_in_rest'  => true,
 		'auth_callback' => function() {
-			return current_user_can( 'edit_posts' );
+			return current_user_can( 'edit_clog_entries' );
 		},
 	] );
 }

@@ -5,7 +5,7 @@ import path from 'path'
 
 export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
-  base: mode === 'production' ? './' : '/',
+  base: mode === 'production' ? './' : '/clog',
   build: {
     manifest: true,
   },

@@ -3,7 +3,7 @@ import { test, expect } from './fixtures';
 test.describe('Home Page', () => {
   test('displays welcome heading and seed data counts', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/home');
+    await page.goto('/clog/home');
     await waitForData(page);
 
     await expect(page.getByRole('heading', { name: 'Welcome to Clog' })).toBeVisible();
@@ -22,34 +22,34 @@ test.describe('Home Page', () => {
 
   test('navigates to items page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/home');
+    await page.goto('/clog/home');
     await waitForData(page);
 
-    await page.locator('a[href="/items"]:has-text("View All")').click();
+    await page.locator('a[href="/clog/items"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/items');
+    await expect(page).toHaveURL('/clog/items');
     await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
   });
 
   test('navigates to locations page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/home');
+    await page.goto('/clog/home');
     await waitForData(page);
 
-    await page.locator('a[href="/locations"]:has-text("View All")').click();
+    await page.locator('a[href="/clog/locations"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/locations');
+    await expect(page).toHaveURL('/clog/locations');
     await expect(page.getByRole('heading', { name: 'Locations' })).toBeVisible();
   });
 
   test('navigates to inventory page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/home');
+    await page.goto('/clog/home');
     await waitForData(page);
 
-    await page.locator('a[href="/inventory"]:has-text("View All")').click();
+    await page.locator('a[href="/clog/inventory"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/inventory');
+    await expect(page).toHaveURL('/clog/inventory');
     await expect(page.getByRole('heading', { name: 'Inventory' })).toBeVisible();
   });
 });

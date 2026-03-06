@@ -22,6 +22,11 @@ $asset_url = plugins_url( 'assets/', dirname( __FILE__ ) );
 </head>
 <body>
     <div id="root"></div>
+    <?php
+    $token = \WPGraphQL\JWT_Authentication\Auth::get_token( wp_get_current_user() );
+    if ( $token && ! is_wp_error( $token ) ) : ?>
+    <script>window.__CLOG_TOKEN__ = <?php echo wp_json_encode( $token ); ?>;</script>
+    <?php endif; ?>
     <?php if ( $assets['js'] ) : ?>
     <script type="module" src="<?php echo esc_url( $dist_url . $assets['js'] ); ?>"></script>
     <?php endif; ?>

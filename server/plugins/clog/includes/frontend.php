@@ -40,6 +40,13 @@ function clog_template_include( $template ) {
 add_filter( 'template_include', 'clog_template_include' );
 
 /**
+ * Extend JWT expiry to 1 hour for SPA sessions.
+ */
+add_filter( 'graphql_jwt_auth_expire', function () {
+	return HOUR_IN_SECONDS;
+} );
+
+/**
  * Read the Vite manifest and return the entry point JS and CSS filenames.
  *
  * @return array{js: string, css: string[]} Asset paths relative to dist/.
@@ -69,13 +76,11 @@ function clog_get_vite_assets() {
 function clog_activate() {
 	clog_rewrite_rules();
 	flush_rewrite_rules();
-	clog_add_role_caps();
 }
 
 /**
- * Flush rewrite rules and remove custom capabilities on plugin deactivation.
+ * Flush rewrite rules on plugin deactivation.
  */
 function clog_deactivate() {
 	flush_rewrite_rules();
-	clog_remove_role_caps();
 }

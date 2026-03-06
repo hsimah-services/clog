@@ -1,20 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)",
-      "Bash(gh issue view:*)",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:api.github.com)",
-      "Bash(gh api:*)",
-      "Bash(git checkout:*)",
-      "Bash(ldconfig:*)",
-      "Bash(dpkg:*)",
-      "Bash(npx playwright test:*)",
-      "WebSearch",
-      "Bash(npm run test:e2e:*)",
-      "Bash(gh run view:*)",
-      "Bash(curl:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

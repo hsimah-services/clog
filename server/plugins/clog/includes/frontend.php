@@ -29,11 +29,22 @@ add_filter( 'query_vars', 'clog_query_vars' );
  */
 function clog_template_include( $template ) {
 	if ( get_query_var( 'clog_app' ) ) {
+		if ( ! is_user_logged_in() ) {
+			auth_redirect();
+			exit;
+		}
 		return CLOG_PLUGIN_DIR . 'templates/app.php';
 	}
 	return $template;
 }
 add_filter( 'template_include', 'clog_template_include' );
+
+/**
+ * Extend JWT expiry to 1 hour for SPA sessions.
+ */
+add_filter( 'graphql_jwt_auth_expire', function () {
+	return HOUR_IN_SECONDS;
+} );
 
 /**
  * Read the Vite manifest and return the entry point JS and CSS filenames.

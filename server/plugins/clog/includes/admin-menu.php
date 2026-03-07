@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'admin_menu', 'clog_register_admin_menu' );
+add_action( 'admin_menu', 'clog_register_admin_menu', 9 );
 
 function clog_register_admin_menu(): void {
 	add_menu_page(
@@ -18,6 +18,15 @@ function clog_register_admin_menu(): void {
 		'clog_render_landing_page',
 		'dashicons-archive',
 		26
+	);
+
+	add_submenu_page(
+		'clog',
+		__( 'Dashboard', 'clog' ),
+		__( 'Dashboard', 'clog' ),
+		'edit_posts',
+		'clog',
+		'clog_render_landing_page'
 	);
 }
 

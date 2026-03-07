@@ -18,10 +18,12 @@ Clog (Cave Log) is a React + TypeScript inventory management system for tracking
   - `locations/` - Location management components
   - `inventory/` - Inventory management components
   - `layout/` - Layout wrapper components
+  - `barcode/` - barcode scanner dialog and hooks
 - `src/context/` - React Context for global state (DataContext)
 - `src/types/` - TypeScript type definitions
 - `src/lib/` - Utility functions
 
+The repository also contains a `server/` directory hosting a WordPress plugin and themes; Docker Compose (`docker-compose.yml`) is used to wire together a local WordPress instance, database, Redis, and the React development server.
 ## Naming Conventions
 
 ### Components

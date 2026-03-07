@@ -2,7 +2,7 @@ FROM wordpress:6-apache
 
 RUN echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list \ && echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list \ && echo "deb http://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list
 
-RUN apt-get update && apt-get install -y curl unzip ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Install PHP Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
@@ -10,21 +10,6 @@ RUN pecl install redis && docker-php-ext-enable redis
 # Install WP-CLI
 RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x /usr/local/bin/wp
-
-# Download and install WPGraphQL plugin
-RUN curl -L -o /tmp/wp-graphql.zip https://downloads.wordpress.org/plugin/wp-graphql.latest-stable.zip \
-    && unzip /tmp/wp-graphql.zip -d /usr/src/wordpress/wp-content/plugins/ \
-    && rm /tmp/wp-graphql.zip
-
-# Download and install WPGraphQL JWT Authentication plugin
-RUN curl -L -o /tmp/wp-graphql-jwt-auth.zip https://github.com/wp-graphql/wp-graphql-jwt-authentication/archive/refs/tags/v0.7.0.zip \
-    && unzip /tmp/wp-graphql-jwt-auth.zip -d /usr/src/wordpress/wp-content/plugins/ \
-    && rm /tmp/wp-graphql-jwt-auth.zip
-
-# Download and install WP Redis plugin
-RUN curl -L -o /tmp/wp-redis.zip https://downloads.wordpress.org/plugin/wp-redis.latest-stable.zip \
-    && unzip /tmp/wp-redis.zip -d /usr/src/wordpress/wp-content/plugins/ \
-    && rm /tmp/wp-redis.zip
 
 # Copy PHP upload config
 COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini

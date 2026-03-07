@@ -26,20 +26,29 @@ if ! wp core is-installed --allow-root --quiet 2>/dev/null; then
   echo "WordPress installed successfully."
 fi
 
-# Copy plugins from source to live directory if missing (handles persistent volumes)
-for plugin_dir in wp-graphql wp-graphql-jwt-authentication-0.7.0 wp-redis; do
-  if [ -d "/usr/src/wordpress/wp-content/plugins/$plugin_dir" ] && [ ! -d "/var/www/html/wp-content/plugins/$plugin_dir" ]; then
-    cp -r "/usr/src/wordpress/wp-content/plugins/$plugin_dir" "/var/www/html/wp-content/plugins/"
-    echo "Copied plugin: $plugin_dir"
-  fi
-done
+# Copy object-cache.php drop-in to live directory if missing
+if [ ! -f /var/www/html/wp-content/object-cache.php ]; then
+  cp /usr/src/wordpress/wp-content/object-cache.php /var/www/html/wp-content/object-cache.php
+  echo "Copied object-cache.php drop-in"
+fi
 
-# Activate plugins if not already active
-for plugin in wp-graphql wp-graphql-jwt-authentication-0.7.0 wp-redis clog; do
-  if ! wp plugin is-active "$plugin" --allow-root 2>/dev/null; then
-    wp plugin activate "$plugin" --allow-root 2>/dev/null && echo "Activated: $plugin" || echo "Could not activate: $plugin"
-  fi
-done
+# Remove legacy plugin directory (old Dockerfile unzipped the GitHub archive with a versioned name)
+if [ -d /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication-0.7.0 ]; then
+  rm -rf /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication-0.7.0
+  echo "Removed legacy wp-graphql-jwt-authentication-0.7.0 directory"
+fi
+
+# Install and activate plugins via WP-CLI
+wp plugin install wp-graphql --activate --allow-root
+if [ -d /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication ]; then
+  wp plugin activate wp-graphql-jwt-authentication --allow-root
+else
+  wp plugin install https://github.com/wp-graphql/wp-graphql-jwt-authentication/archive/refs/tags/v0.7.0.zip --activate --allow-root
+fi
+wp plugin install wp-redis --activate --allow-root
+
+# Activate the local clog plugin (mounted via volume, not installed via WP-CLI)
+wp plugin activate clog --allow-root 2>/dev/null || echo "Could not activate: clog"
 
 # Set permalink structure (required for WPGraphQL pretty URLs)
 wp rewrite structure '/%postname%/' --allow-root 2>/dev/null || true

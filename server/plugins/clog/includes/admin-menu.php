@@ -21,6 +21,22 @@ function clog_register_admin_menu(): void {
 	);
 }
 
+add_action( 'admin_bar_menu', 'clog_register_dev_admin_bar', 100 );
+
+function clog_register_dev_admin_bar( WP_Admin_Bar $wp_admin_bar ): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$wp_admin_bar->add_node( array(
+		'id'     => 'clog-dev-open-site',
+		'parent' => 'site-name',
+		'title'  => __( 'Open Clog', 'clog' ),
+		'href'   => home_url( '/clog' ),
+		'meta'   => array( 'target' => '_blank' ),
+	) );
+}
+
 function clog_render_landing_page(): void {
 	$items_count     = wp_count_posts( 'clog_item' );
 	$locations_count = wp_count_posts( 'clog_location' );

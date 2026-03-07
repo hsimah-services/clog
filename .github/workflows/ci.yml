@@ -1,20 +1,39 @@
-name: Playwright E2E Tests
+name: CI
 
 on:
   pull_request:
     branches: [main]
 
-defaults:
-  run:
-    working-directory: client
-
 jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build
+        env:
+          VITE_GRAPHQL_URL: /graphql
+
   e2e-tests:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: client
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Teardown previous run
         working-directory: .
@@ -46,15 +65,13 @@ jobs:
           docker compose -f .github/workflows/e2e-tests/docker-compose.yml
           exec -T wordpress wp clog seed --allow-root
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: client/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium

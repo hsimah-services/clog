@@ -18,6 +18,9 @@ require_once CLOG_PLUGIN_DIR . 'includes/meta-fields.php';
 require_once CLOG_PLUGIN_DIR . 'includes/graphql.php';
 require_once CLOG_PLUGIN_DIR . 'includes/admin-menu.php';
 require_once CLOG_PLUGIN_DIR . 'includes/seed-data.php';
+require_once CLOG_PLUGIN_DIR . 'includes/snapshots.php';
+require_once CLOG_PLUGIN_DIR . 'includes/snapshot-cron.php';
+require_once CLOG_PLUGIN_DIR . 'includes/snapshot-cli.php';
 require_once CLOG_PLUGIN_DIR . 'includes/frontend.php';
 
 register_activation_hook( __FILE__, 'clog_activate' );

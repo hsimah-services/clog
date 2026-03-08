@@ -52,6 +52,9 @@ services:
         define('WP_REDIS_PORT', ${REDIS_PORT});
         define('WP_CACHE', true);
         define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${GRAPHQL_JWT_AUTH_SECRET_KEY}');
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', true);
+        define('GRAPHQL_DEBUG', true);
 
   phpmyadmin:
     image: phpmyadmin:latest

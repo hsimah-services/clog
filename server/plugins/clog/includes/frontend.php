@@ -76,6 +76,8 @@ function clog_get_vite_assets() {
 function clog_activate() {
 	clog_rewrite_rules();
 	flush_rewrite_rules();
+	clog_get_snapshot_dir();
+	clog_schedule_snapshot_events();
 }
 
 /**
@@ -83,4 +85,5 @@ function clog_activate() {
  */
 function clog_deactivate() {
 	flush_rewrite_rules();
+	clog_unschedule_snapshot_events();
 }

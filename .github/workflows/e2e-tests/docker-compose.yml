@@ -37,7 +37,7 @@ services:
     ports:
       - "6060:80"
     volumes:
-      - ../../../server/plugins/clog:/var/www/html/wp-content/plugins/clog
+      - ../../../server:/var/www/html/wp-content/plugins/clog
     environment:
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_REDIS_HOST', 'redis');

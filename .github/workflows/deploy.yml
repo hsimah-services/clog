@@ -112,13 +112,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
-          path: server/plugins/clog/dist/
+          path: server/dist/
 
       - name: Remove old plugin from container
         run: docker exec pupyrus rm -rf /var/www/html/wp-content/plugins/clog
 
       - name: Copy plugin to container
-        run: docker cp server/plugins/clog pupyrus:/var/www/html/wp-content/plugins/clog
+        run: docker cp server pupyrus:/var/www/html/wp-content/plugins/clog
 
       - name: Activate plugin
         run: |

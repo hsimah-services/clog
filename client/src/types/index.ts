@@ -25,3 +25,12 @@ export interface Inventory {
   dateExpiry: Date | null;
   createdAt: Date;
 }
+// bulk/offline queue types
+export type BulkEntity = 'item' | 'inventory';
+
+export type BulkOp =
+  | { type: 'create'; entity: BulkEntity; data: Partial<Item> | Partial<Inventory> }
+  | { type: 'update'; entity: BulkEntity; id: string; data: Partial<Item> | Partial<Inventory> }
+  | { type: 'delete'; entity: BulkEntity; id: string };
+
+export type BulkQueue = BulkOp[];

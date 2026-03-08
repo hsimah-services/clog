@@ -10,6 +10,7 @@ const NewLocationPage = React.lazy(() => import('@/pages/locations/NewLocationPa
 const LocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.LocationPage })));
 const EditLocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.EditLocationPage })));
 const InventoryPage = React.lazy(() => import('@/pages/inventory/InventoryPage').then(m => ({ default: m.InventoryPage })));
+const BulkPage = React.lazy(() => import('@/pages/BulkPage').then(m => ({ default: m.BulkPage })));
 const NewInventoryPage = React.lazy(() => import('@/pages/inventory/NewInventoryPage').then(m => ({ default: m.NewInventoryPage })));
 const InventoryItemPage = React.lazy(() => import('@/pages/inventory/InventoryItemPage').then(m => ({ default: m.InventoryItemPage })));
 const EditInventoryPage = React.lazy(() => import('@/pages/inventory/InventoryItemPage').then(m => ({ default: m.EditInventoryPage })));
@@ -66,6 +67,11 @@ export const routeMap: RouteConfig[] = [
       { path: ':id', element: InventoryItemPage },
       { path: ':id/edit', element: EditInventoryPage },
     ],
+  },
+  {
+    path: '/bulk',
+    label: 'Bulk Mode',
+    element: BulkPage,
   },
 ];
 

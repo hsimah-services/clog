@@ -40,6 +40,7 @@ export const test = base.extend<{
 
       await context.addInitScript((jwt: string) => {
         window.localStorage.setItem('clog_jwt_token', jwt);
+        window.localStorage.removeItem('clog_bulk_queue');
       }, token);
     });
   },

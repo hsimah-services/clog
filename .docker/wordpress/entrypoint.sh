@@ -20,7 +20,7 @@ if ! wp core is-installed --allow-root --quiet 2>/dev/null; then
     --title="${WP_TITLE:-Clog}" \
     --admin_user="${WP_ADMIN_USER:-admin}" \
     --admin_password="${WP_ADMIN_PASSWORD:-admin}" \
-    --admin_email="${WP_ADMIN_EMAIL:-admin@localhost}" \
+    --admin_email="${WP_ADMIN_EMAIL:-admin@example.com}" \
     --skip-email \
     --allow-root
   echo "WordPress installed successfully."

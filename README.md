@@ -6,9 +6,20 @@ Clog is a React‑powered inventory management frontend that lives inside a Word
 
 ## Requirements
 
-- **Docker & Docker Compose v2** (Docker Desktop on macOS/Windows or engine on Linux)
-- **Node.js 18+ and npm/yarn** for the client build and tests
-- A `.env` file at the project root (see `.env.example` for required variables)
+A container runtime is the only hard requirement — WordPress, PHP, MySQL, Redis and
+Node all run inside containers, so nothing needs to be installed on the host.
+
+- **Podman** (rootless, no daemon) plus a compose CLI — on Fedora:
+  ```bash
+  sudo dnf install docker-compose
+  systemctl --user enable --now podman.socket
+  ```
+  *or* **Docker Engine / Docker Desktop** with Compose v2. `scripts/dev.sh` detects
+  whichever is present and wires up the socket for you.
+- A `.env` file at the project root. `scripts/dev.sh` creates one from
+  `.env.example` on first run.
+- **Node.js 18+** is optional, and only needed if you want to run the client build or
+  the Playwright e2e suite directly on the host rather than in the `client` container.
 
 ---
 
@@ -18,7 +29,10 @@ Clog is a React‑powered inventory management frontend that lives inside a Word
 /                       # project root
   client/               # React/Vite SPA (frontend)
   server/               # WordPress plugin (`plugins/clog`) and themes
+  .docker/wordpress/    # WordPress image: WP-CLI, Redis ext, first-run install script
   docker-compose.yml    # brings up WordPress, MySQL, Redis, Mailpit, PhpMyAdmin, and the client dev server
+  scripts/dev.sh        # single entry point for the dev stack (up/down/logs/reset/wp)
+  .env.example          # committed template for .env
   .env                  # local environment (ignored by git)
   CLAUDE.md             # coding conventions / developer handbook
   README.md             # this file
@@ -28,11 +42,34 @@ Clog is a React‑powered inventory management frontend that lives inside a Word
 
 ## Development setup
 
-1. **Start all services**
+1. **Start everything**
 
    ```bash
-   docker compose up --build -d
+   scripts/dev.sh up
    ```
+
+   That is the whole setup. The script picks a container runtime, starts the podman
+   socket if that is what you have, creates `.env` from `.env.example` if it is
+   missing, and brings the stack up. On first run WordPress installs itself,
+   activates the `clog` plugin from the bind-mounted `server/` directory, and
+   installs WPGraphQL, WPGraphQL-JWT and WP-Redis (see
+   `.docker/wordpress/entrypoint.sh`).
+
+   Other subcommands:
+
+   | Command | Effect |
+   | --- | --- |
+   | `scripts/dev.sh up` | Build and start the stack |
+   | `scripts/dev.sh down` | Stop the stack, keeping data |
+   | `scripts/dev.sh logs wordpress` | Follow a service's logs |
+   | `scripts/dev.sh status` | List running services |
+   | `scripts/dev.sh wp plugin list` | Run WP-CLI in the WordPress container |
+   | `scripts/dev.sh shell` | Bash shell in the WordPress container |
+   | `scripts/dev.sh reset` | **Destructive** — drop the DB and WP install, then reinstall clean |
+
+   In VS Code the stack starts automatically on folder open via
+   `.vscode/tasks.json`; the same tasks are available from the command palette. In
+   Emacs, `M-x compile RET scripts/dev.sh up` does the same thing.
 
    The container set includes:
    - MySQL database (`db`)
@@ -42,25 +79,33 @@ Clog is a React‑powered inventory management frontend that lives inside a Word
    - Mailpit SMTP/HTTP viewer (`mailpit`)
    - Vite dev server for the client (`client`)
 
-2. **Install and run the frontend**
+2. **The frontend**
+
+   The `client` service already runs Vite on http://localhost:3000 with `client/src`
+   and `client/public` bind-mounted, so hot reload works against the files in your
+   editor with no host-side Node install.
+
+   If you would rather run it on the host (for example to use an IDE's Node
+   integration), stop that service and run it yourself:
 
    ```bash
-   cd client
-   npm install         # or yarn
-   npm run dev         # starts Vite on http://localhost:3000
+   scripts/dev.sh down client
+   cd client && npm install && npm run dev
    ```
 
-   The client will proxy requests to `http://localhost:8080/graphql` (configurable via `VITE_GRAPHQL_URL`).
+   Either way the client talks to `http://localhost:8080/graphql` (configurable via
+   `VITE_GRAPHQL_URL`).
 
 3. **Access the app**
 
-   - **Frontend:** http://localhost:3000
+   - **Frontend:** http://localhost:3000/clog
    - **WordPress admin:** http://localhost:8080/wp-admin (use credentials from `.env`)
 
 4. **Stopping/tearing down**
 
    ```bash
-   docker compose down
+   scripts/dev.sh down     # stop, keep the database
+   scripts/dev.sh reset    # stop and destroy the database and WP install
    ```
 
 ---
@@ -102,24 +147,23 @@ The build artifacts are mounted into the WordPress plugin via the `docker-compos
 
 ## Environment variables
 
-The `.env` file should contain at least:
-
-```dotenv
-MYSQL_ROOT_PASSWORD=...
-WORDPRESS_DB_USER=...
-WORDPRESS_DB_PASSWORD=...
-WORDPRESS_DB_NAME=...
-WORDPRESS_DB_HOST=db
-WORDPRESS_TABLE_PREFIX=wp_
-REDIS_HOST=redis
-REDIS_PORT=6379
-GRAPHQL_JWT_AUTH_SECRET_KEY=some-secret
-VITE_GRAPHQL_URL=http://localhost:8080/graphql
-WP_ADMIN_USER=admin          # for e2e tests
-WP_ADMIN_PASSWORD=secret     # for e2e tests
-```
+`.env.example` is the authoritative list and is committed; `.env` is gitignored.
+`scripts/dev.sh` copies the template on first run, so the defaults work as-is for
+local development. Every value in it is a throwaway development credential —
+`WP_ADMIN_USER` / `WP_ADMIN_PASSWORD` are the wp-admin login and are also what the
+Playwright suite authenticates with.
 
 Additional environment variables may be defined in `.env.ci` or production copies; never commit secrets.
+
+---
+
+## Notes for Fedora / SELinux hosts
+
+The bind mounts in `docker-compose.yml` carry `:z` labels so SELinux lets the
+container read `server/` and `client/`. Under rootless podman your files appear as
+`root`-owned inside the container, which is fine — WordPress only ever reads the
+plugin directory. If the plugin fails to activate, check the labels with
+`ls -Z server` and confirm they are `container_file_t`.
 
 ---
 

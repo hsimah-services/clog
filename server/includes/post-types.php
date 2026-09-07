@@ -30,9 +30,6 @@ function clog_register_post_types(): void {
 		'exclude_from_search' => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
-		'show_in_graphql'    => true,
-		'graphql_single_name' => 'ClogItem',
-		'graphql_plural_name' => 'ClogItems',
 	] );
 
 	// Location
@@ -55,9 +52,6 @@ function clog_register_post_types(): void {
 		'exclude_from_search' => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
-		'show_in_graphql'    => true,
-		'graphql_single_name' => 'ClogLocation',
-		'graphql_plural_name' => 'ClogLocations',
 	] );
 
 	// Inventory
@@ -80,8 +74,5 @@ function clog_register_post_types(): void {
 		'exclude_from_search' => true,
 		'show_in_menu' => 'clog',
 		'supports'     => [ 'title', 'custom-fields' ],
-		'show_in_graphql'    => true,
-		'graphql_single_name' => 'ClogInventory',
-		'graphql_plural_name' => 'ClogInventoryEntries',
 	] );
 }

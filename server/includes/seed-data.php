@@ -13,10 +13,21 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
 }
 
+use Clog\Runtime\Clog;
+
 WP_CLI::add_command( 'clog seed', 'clog_seed_data' );
 
 /**
- * Seed test data matching client/src/data/seed.json.
+ * Seed test data through the entity gateway.
+ *
+ * Everything goes through the gateway rather than wp_insert_post and post meta: the
+ * custom tables are the storage now, and seeding around them would produce a database
+ * the API cannot see. It doubles as the widest exercise of the write path there is.
+ *
+ * ## OPTIONS
+ *
+ * [--force]
+ * : Seed even when entities already exist.
  *
  * ## EXAMPLES
  *
@@ -24,134 +35,84 @@ WP_CLI::add_command( 'clog seed', 'clog_seed_data' );
  *
  * @when after_wp_load
  */
-function clog_seed_data(): void {
-	// Check if data already exists.
-	$existing = get_posts( [
-		'post_type'   => 'clog_item',
-		'numberposts' => 1,
-		'post_status' => 'publish',
-	] );
+function clog_seed_data( array $args, array $assoc ): void {
+	$clog = Clog::instance();
 
-	if ( ! empty( $existing ) ) {
-		WP_CLI::warning( 'Seed data already exists. Delete existing posts first to re-seed.' );
+	if ( [] !== $clog->tables()->missing() ) {
+		WP_CLI::error( 'Entity tables are missing. Run `wp clog install` first.' );
 		return;
 	}
 
-	// Items.
+	$gateway = $clog->gateway();
+
+	if ( $gateway->all( 'Item' )->count() > 0 && ! isset( $assoc['force'] ) ) {
+		WP_CLI::warning( 'Seed data already exists. Pass --force to add more anyway.' );
+		return;
+	}
+
+	// One barcode per item, and no default expiry: both dropped from the spec.
 	$items = [
-		[
-			'name'         => 'Heinz Ketchup',
-			'barcodes'     => [ '013000006057' ],
-			'expiry_unit'  => 'months',
-			'expiry_value' => 6,
-		],
-		[
-			'name'         => 'Dry Dog Food',
-			'barcodes'     => [ '017800149341' ],
-			'expiry_unit'  => null,
-			'expiry_value' => null,
-		],
-		[
-			'name'         => 'Wet Dog Food',
-			'barcodes'     => [ '017800153560' ],
-			'expiry_unit'  => 'days',
-			'expiry_value' => 90,
-		],
+		'Heinz Ketchup'          => '013000006057',
+		'Purina Dry Dog Food'    => '017800149341',
+		'Pedigree Wet Dog Food'  => '017800153560',
 	];
 
 	$item_ids = [];
-	foreach ( $items as $item ) {
-		$post_id = wp_insert_post( [
-			'post_type'   => 'clog_item',
-			'post_title'  => $item['name'],
-			'post_status' => 'publish',
+
+	foreach ( $items as $name => $barcode ) {
+		$item_ids[] = $gateway->create( 'Item', [
+			'name'    => $name,
+			'barcode' => $barcode,
 		] );
 
-		if ( is_wp_error( $post_id ) ) {
-			WP_CLI::error( "Failed to create item: {$item['name']}" );
-			return;
-		}
-
-		update_post_meta( $post_id, 'clog_barcodes', $item['barcodes'] );
-
-		if ( $item['expiry_unit'] !== null ) {
-			update_post_meta( $post_id, 'clog_default_expiry_unit', $item['expiry_unit'] );
-			update_post_meta( $post_id, 'clog_default_expiry_value', $item['expiry_value'] );
-		}
-
-		$item_ids[] = $post_id;
-		WP_CLI::log( "Created item: {$item['name']} (ID: {$post_id})" );
+		WP_CLI::log( "Created item: {$name}" );
 	}
 
-	// Locations.
-	$locations = [
-		'Garage Shelves',
-		'Garage Freezer',
-		'Kitchen Cabinet',
-		'Kitchen Freezer',
-	];
+	$locations = [ 'Garage Shelves', 'Garage Freezer', 'Kitchen Cabinet', 'Kitchen Freezer' ];
 
 	$location_ids = [];
+
 	foreach ( $locations as $name ) {
-		$post_id = wp_insert_post( [
-			'post_type'   => 'clog_location',
-			'post_title'  => $name,
-			'post_status' => 'publish',
-		] );
+		$location_ids[] = $gateway->create( 'Location', [ 'name' => $name ] );
 
-		if ( is_wp_error( $post_id ) ) {
-			WP_CLI::error( "Failed to create location: {$name}" );
-			return;
-		}
-
-		$location_ids[] = $post_id;
-		WP_CLI::log( "Created location: {$name} (ID: {$post_id})" );
+		WP_CLI::log( "Created location: {$name}" );
 	}
 
-	// Inventory entries.
-	// References: item_ids[0]=Ketchup, [1]=Dry Dog Food, [2]=Wet Dog Food
-	// location_ids: [0]=Garage Shelves, [1]=Garage Freezer, [2]=Kitchen Cabinet, [3]=Kitchen Freezer
-	$inventory_entries = [
-		[ 'item' => 0, 'loc' => 2, 'added' => '2025-01-20T12:00:00', 'expiry' => '2025-07-20T00:00:00' ],
-		[ 'item' => 0, 'loc' => 2, 'added' => '2025-01-22T09:00:00', 'expiry' => '2025-08-01T00:00:00' ],
-		[ 'item' => 0, 'loc' => 0, 'added' => '2025-01-20T12:05:00', 'expiry' => '2025-06-15T00:00:00' ],
-		[ 'item' => 0, 'loc' => 0, 'added' => '2025-01-21T10:00:00', 'expiry' => '2025-09-01T00:00:00' ],
-		[ 'item' => 0, 'loc' => 0, 'added' => '2025-01-25T14:30:00', 'expiry' => null ],
-		[ 'item' => 1, 'loc' => 0, 'added' => '2025-01-21T14:00:00', 'expiry' => null ],
-		[ 'item' => 1, 'loc' => 0, 'added' => '2025-01-23T08:00:00', 'expiry' => null ],
-		[ 'item' => 1, 'loc' => 0, 'added' => '2025-01-26T11:00:00', 'expiry' => null ],
-		[ 'item' => 2, 'loc' => 2, 'added' => '2025-01-22T10:30:00', 'expiry' => '2025-04-22T00:00:00' ],
-		[ 'item' => 2, 'loc' => 2, 'added' => '2025-01-23T10:30:00', 'expiry' => '2025-05-01T00:00:00' ],
-		[ 'item' => 2, 'loc' => 2, 'added' => '2025-01-24T10:30:00', 'expiry' => null ],
-		[ 'item' => 2, 'loc' => 1, 'added' => '2025-01-22T10:35:00', 'expiry' => '2025-06-01T00:00:00' ],
-		[ 'item' => 2, 'loc' => 1, 'added' => '2025-01-23T10:35:00', 'expiry' => '2025-06-15T00:00:00' ],
-		[ 'item' => 2, 'loc' => 1, 'added' => '2025-01-24T10:35:00', 'expiry' => null ],
+	// [ item index, location index, date added ]. Expiry is gone from the model.
+	$entries = [
+		[ 0, 2, '2025-01-20 12:00:00' ],
+		[ 0, 2, '2025-01-22 09:00:00' ],
+		[ 0, 0, '2025-01-20 12:05:00' ],
+		[ 0, 0, '2025-01-21 10:00:00' ],
+		[ 0, 0, '2025-01-25 14:30:00' ],
+		[ 1, 0, '2025-01-21 14:00:00' ],
+		[ 1, 0, '2025-01-23 08:00:00' ],
+		[ 1, 0, '2025-01-26 11:00:00' ],
+		[ 2, 2, '2025-01-22 10:30:00' ],
+		[ 2, 2, '2025-01-23 10:30:00' ],
+		[ 2, 2, '2025-01-24 10:30:00' ],
+		[ 2, 1, '2025-01-22 10:35:00' ],
+		[ 2, 1, '2025-01-23 10:35:00' ],
+		[ 2, 1, '2025-01-24 10:35:00' ],
 	];
 
-	$inv_count = 0;
-	foreach ( $inventory_entries as $entry ) {
-		$inv_count++;
-		$post_id = wp_insert_post( [
-			'post_type'   => 'clog_inventory',
-			'post_title'  => "Inventory Entry {$inv_count}",
-			'post_status' => 'publish',
+	$item_names = array_keys( $items );
+
+	foreach ( $entries as $index => [ $item, $location, $added ] ) {
+		$gateway->create( 'Inventory', [
+			'name'      => sprintf( '%s @ %s', $item_names[ $item ], $locations[ $location ] ),
+			'dateAdded' => $added,
+			'item'      => $item_ids[ $item ]->raw(),
+			'location'  => $location_ids[ $location ]->raw(),
 		] );
 
-		if ( is_wp_error( $post_id ) ) {
-			WP_CLI::error( "Failed to create inventory entry #{$inv_count}" );
-			return;
-		}
-
-		update_post_meta( $post_id, 'clog_item_id', $item_ids[ $entry['item'] ] );
-		update_post_meta( $post_id, 'clog_location_id', $location_ids[ $entry['loc'] ] );
-		update_post_meta( $post_id, 'clog_date_added', $entry['added'] );
-
-		if ( $entry['expiry'] !== null ) {
-			update_post_meta( $post_id, 'clog_date_expiry', $entry['expiry'] );
-		}
-
-		WP_CLI::log( "Created inventory entry #{$inv_count} (ID: {$post_id})" );
+		WP_CLI::log( sprintf( 'Created inventory entry #%d', $index + 1 ) );
 	}
 
-	WP_CLI::success( "Seeded " . count( $item_ids ) . " items, " . count( $location_ids ) . " locations, and {$inv_count} inventory entries." );
+	WP_CLI::success( sprintf(
+		'Seeded %d items, %d locations and %d inventory entries.',
+		count( $item_ids ),
+		count( $location_ids ),
+		count( $entries ),
+	) );
 }

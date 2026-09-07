@@ -22,8 +22,8 @@ if ( file_exists( CLOG_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 }
 
 require_once CLOG_PLUGIN_DIR . 'includes/post-types.php';
-require_once CLOG_PLUGIN_DIR . 'includes/meta-fields.php';
-require_once CLOG_PLUGIN_DIR . 'includes/graphql.php';
+require_once CLOG_PLUGIN_DIR . 'includes/runtime.php';
+require_once CLOG_PLUGIN_DIR . 'includes/entity-cli.php';
 require_once CLOG_PLUGIN_DIR . 'includes/admin-menu.php';
 require_once CLOG_PLUGIN_DIR . 'includes/seed-data.php';
 require_once CLOG_PLUGIN_DIR . 'includes/frontend.php';

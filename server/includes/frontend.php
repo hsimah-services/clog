@@ -77,6 +77,10 @@ function clog_activate() {
 	clog_rewrite_rules();
 	flush_rewrite_rules();
 	clog_clear_legacy_snapshot_events();
+
+	// The entity tables are the storage; without them every resolver hits a table
+	// that is not there. Creation only — an existing table is left alone.
+	clog_install_tables();
 }
 
 /**

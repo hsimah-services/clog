@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:63e852502ef741c4df2861577d6472ff80c8c924dfa647953de0fe7b0c76cd6b
+ * digest: sha256:aafea3ea09cc131df70b28f5eb1942697c967ccba757a8b282ab3fb454a753c7
  */
 
 namespace Eleph\WordPress\Manifest;
@@ -28,6 +28,23 @@ use Eleph\Schema\Ir\RelationKind;
  */
 return new StorageManifest(
     tables: [
+        'Item' => new TableSchema(
+            'clog_item',
+            [
+                'id' => new Column('id', 'BIGINT UNSIGNED', false, true, null),
+                'created_at' => new Column('created_at', 'DATETIME', false, false, null),
+                'updated_at' => new Column('updated_at', 'DATETIME', true, false, null),
+                'post_id' => new Column('post_id', 'BIGINT', false, false, null),
+                'name' => new Column('name', 'VARCHAR(200)', false, false, null),
+                'barcode' => new Column('barcode', 'VARCHAR(64)', true, false, null),
+            ],
+            [
+                'clog_item_post_id_uniq' => new Index('clog_item_post_id_uniq', ['post_id'], true),
+                'clog_item_name_idx' => new Index('clog_item_name_idx', ['name'], false),
+                'clog_item_barcode_uniq' => new Index('clog_item_barcode_uniq', ['barcode'], true),
+            ],
+            'id',
+        ),
         'Location' => new TableSchema(
             'clog_location',
             [
@@ -48,6 +65,7 @@ return new StorageManifest(
 
     ],
     columns: [
+        'Item' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'barcode' => 'barcode'],
         'Location' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name'],
     ],
 );

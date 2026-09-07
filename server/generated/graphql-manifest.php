@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:59c28cb47f781734afb02b51a1831d54d7eb63563f67623d8424ed7458bf9a46
+ * digest: sha256:6ed7b85819f5db8dda43912f2d59ffd636b34c585794fc7bcc5201a8ac764113
  */
 
 namespace Eleph\WPGraphQL\Manifest;
@@ -22,6 +22,21 @@ namespace Eleph\WPGraphQL\Manifest;
  */
 return new Manifest(
     objects: [
+        'ClogItem' => new ObjectTypeEntry(
+            'ClogItem',
+            'Item',
+            [
+                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', null),
+                'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null),
+                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', false, false), 'getUpdatedAt', null),
+                'postId' => new FieldEntry('postId', new GraphQLType('Int', true, false), 'getPostId', 'The wp_posts row this entity projects to.'),
+                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the item is called. Projected to post_title.'),
+                'barcode' => new FieldEntry('barcode', new GraphQLType('String', false, false), 'getBarcode', 'The barcode that identifies this item. One per item: a serialized list could not be indexed, and scanning a barcode to find an item is the query this data exists to serve.
+'),
+            ],
+            [],
+            'A thing that can be stocked, identified by its barcode.',
+        ),
         'ClogLocation' => new ObjectTypeEntry(
             'ClogLocation',
             'Location',
@@ -40,6 +55,20 @@ return new Manifest(
 
     ],
     mutations: [
+        'createClogItem' => new MutationEntry(
+            'createClogItem',
+            'create',
+            'Item',
+            [
+                'createdAt' => new GraphQLType('String', true, false),
+                'updatedAt' => new GraphQLType('String', false, false),
+                'postId' => new GraphQLType('Int', false, false),
+                'name' => new GraphQLType('String', true, false),
+                'barcode' => new GraphQLType('String', false, false),
+            ],
+            null,
+            'Create a ClogItem.',
+        ),
         'createClogLocation' => new MutationEntry(
             'createClogLocation',
             'create',
@@ -52,6 +81,20 @@ return new Manifest(
             ],
             null,
             'Create a ClogLocation.',
+        ),
+        'updateClogItem' => new MutationEntry(
+            'updateClogItem',
+            'update',
+            'Item',
+            [
+                'id' => new GraphQLType('ID', true, false),
+                'updatedAt' => new GraphQLType('String', false, false),
+                'postId' => new GraphQLType('Int', false, false),
+                'name' => new GraphQLType('String', false, false),
+                'barcode' => new GraphQLType('String', false, false),
+            ],
+            null,
+            'Update a ClogItem.',
         ),
         'updateClogLocation' => new MutationEntry(
             'updateClogLocation',
@@ -68,6 +111,7 @@ return new Manifest(
         ),
     ],
     roots: [
+        'ClogItem' => new RootFieldEntry('ClogItem', 'ClogItems', 'Item'),
         'ClogLocation' => new RootFieldEntry('ClogLocation', 'ClogLocations', 'Location'),
     ],
     queries: [

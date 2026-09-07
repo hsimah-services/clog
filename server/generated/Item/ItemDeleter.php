@@ -9,13 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemDeleter.php
- * digest: sha256:f84c7ae154cf18425d45368cc146f64633315c51ac92f5cef043e0099e2f6727
+ * digest: sha256:f24266f34331cc88b473e06e2f7fc6f22347c55efc812f24a7295bd8987713ca
  */
 
 namespace Clog\Entity\Item;
 
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Mutation\Deletion;
+use Eleph\Runtime\Storage\DeletionPolicy;
+use Eleph\Runtime\Storage\DeletionRule;
 use Eleph\Runtime\UnitOfWork\UnitOfWork;
 
 /**
@@ -41,6 +43,8 @@ final class ItemDeleter
      */
     public static function rules(): array
     {
-        return [];
+        return [
+            new DeletionRule('Inventory', 'item', 'Inventory', DeletionPolicy::Cascade, false),
+        ];
     }
 }

@@ -9,11 +9,17 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:dd90461033612f3485dcbb6dd2cea70bed72037e57c3ae8795b2380e5c591e29
+ * digest: sha256:46e1f07582af6518106b49ea998be2c74076c751d1bbaf43428b2da2309e1db8
  */
 
 namespace Clog\Entity;
 
+use Clog\Entity\Inventory\InventoryDeleter;
+use Clog\Entity\Inventory\InventoryHydrator;
+use Clog\Entity\Inventory\InventoryInput;
+use Clog\Entity\Inventory\InventoryMutator;
+use Clog\Entity\Inventory\InventoryTriggers;
+use Clog\Entity\Inventory\InventoryVerifiers;
 use Clog\Entity\Item\ItemDeleter;
 use Clog\Entity\Item\ItemHydrator;
 use Clog\Entity\Item\ItemInput;
@@ -50,7 +56,7 @@ final readonly class Catalogue implements EntityCatalogue
      */
     public function entities(): array
     {
-        return ['Item', 'Location'];
+        return ['Inventory', 'Item', 'Location'];
     }
 
     /**
@@ -59,6 +65,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function hydrator(string $entity): Hydrator
     {
         $service = match ($entity) {
+            'Inventory' => $this->container->get(InventoryHydrator::class),
             'Item' => $this->container->get(ItemHydrator::class),
             'Location' => $this->container->get(LocationHydrator::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
@@ -72,6 +79,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function verifiers(string $entity): EntityVerifiers
     {
         $service = match ($entity) {
+            'Inventory' => $this->container->get(InventoryVerifiers::class),
             'Item' => $this->container->get(ItemVerifiers::class),
             'Location' => $this->container->get(LocationVerifiers::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
@@ -85,6 +93,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function triggers(string $entity): EntityTriggers
     {
         $service = match ($entity) {
+            'Inventory' => $this->container->get(InventoryTriggers::class),
             'Item' => $this->container->get(ItemTriggers::class),
             'Location' => $this->container->get(LocationTriggers::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
@@ -100,7 +109,10 @@ final readonly class Catalogue implements EntityCatalogue
      */
     public function edgeTargets(): array
     {
-        return [];
+        return [
+            'Inventory.item' => 'Item',
+            'Inventory.location' => 'Location',
+        ];
     }
 
     /**
@@ -117,6 +129,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function fieldNames(string $entity): array
     {
         return match ($entity) {
+            'Inventory' => ['createdAt', 'updatedAt', 'postId', 'name', 'dateAdded'],
             'Item' => ['createdAt', 'updatedAt', 'postId', 'name', 'barcode'],
             'Location' => ['createdAt', 'updatedAt', 'postId', 'name'],
             default => [],
@@ -129,6 +142,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function deletionRules(string $entity): array
     {
         return match ($entity) {
+            'Inventory' => InventoryDeleter::rules(),
             'Item' => ItemDeleter::rules(),
             'Location' => LocationDeleter::rules(),
             default => [],
@@ -150,6 +164,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function mutatorFor(string $entity, MutationBuffer $buffer): object
     {
         return match ($entity) {
+            'Inventory' => new InventoryMutator($buffer),
             'Item' => new ItemMutator($buffer),
             'Location' => new LocationMutator($buffer),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
@@ -173,6 +188,7 @@ final readonly class Catalogue implements EntityCatalogue
     public function apply(string $entity, MutationBuffer $buffer, array $input): void
     {
         $applier = match ($entity) {
+            'Inventory' => $this->container->get(InventoryInput::class),
             'Item' => $this->container->get(ItemInput::class),
             'Location' => $this->container->get(LocationInput::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),

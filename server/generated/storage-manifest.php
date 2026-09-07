@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:aafea3ea09cc131df70b28f5eb1942697c967ccba757a8b282ab3fb454a753c7
+ * digest: sha256:dbab82e7ab14529aff190bc925b7f9a4c1fcaa3928844c67e6ccec69183bd025
  */
 
 namespace Eleph\WordPress\Manifest;
@@ -28,6 +28,25 @@ use Eleph\Schema\Ir\RelationKind;
  */
 return new StorageManifest(
     tables: [
+        'Inventory' => new TableSchema(
+            'clog_inventory',
+            [
+                'id' => new Column('id', 'BIGINT UNSIGNED', false, true, null),
+                'created_at' => new Column('created_at', 'DATETIME', false, false, null),
+                'updated_at' => new Column('updated_at', 'DATETIME', true, false, null),
+                'post_id' => new Column('post_id', 'BIGINT', false, false, null),
+                'name' => new Column('name', 'VARCHAR(200)', false, false, null),
+                'date_added' => new Column('date_added', 'DATETIME', false, false, null),
+                'item_id' => new Column('item_id', 'BIGINT UNSIGNED', true, false, null),
+                'location_id' => new Column('location_id', 'BIGINT UNSIGNED', true, false, null),
+            ],
+            [
+                'clog_inventory_post_id_uniq' => new Index('clog_inventory_post_id_uniq', ['post_id'], true),
+                'clog_inventory_item_id_idx' => new Index('clog_inventory_item_id_idx', ['item_id'], false),
+                'clog_inventory_location_id_idx' => new Index('clog_inventory_location_id_idx', ['location_id'], false),
+            ],
+            'id',
+        ),
         'Item' => new TableSchema(
             'clog_item',
             [
@@ -62,9 +81,29 @@ return new StorageManifest(
         ),
     ],
     placements: [
-
+        'Inventory.item' => new EdgePlacement(
+            'Inventory',
+            'item',
+            'Item',
+            RelationKind::ManyToOne,
+            'clog_inventory',
+            'item_id',
+            null,
+            'clog_item',
+        ),
+        'Inventory.location' => new EdgePlacement(
+            'Inventory',
+            'location',
+            'Location',
+            RelationKind::ManyToOne,
+            'clog_inventory',
+            'location_id',
+            null,
+            'clog_location',
+        ),
     ],
     columns: [
+        'Inventory' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'dateAdded' => 'date_added'],
         'Item' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'barcode' => 'barcode'],
         'Location' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name'],
     ],

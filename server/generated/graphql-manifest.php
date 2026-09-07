@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:6ed7b85819f5db8dda43912f2d59ffd636b34c585794fc7bcc5201a8ac764113
+ * digest: sha256:b272522353006526890ad64b9a38b7e1154023e9e0f77627c908840b472adb1d
  */
 
 namespace Eleph\WPGraphQL\Manifest;
@@ -22,6 +22,22 @@ namespace Eleph\WPGraphQL\Manifest;
  */
 return new Manifest(
     objects: [
+        'ClogInventory' => new ObjectTypeEntry(
+            'ClogInventory',
+            'Inventory',
+            [
+                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', null),
+                'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null),
+                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', false, false), 'getUpdatedAt', null),
+                'postId' => new FieldEntry('postId', new GraphQLType('Int', true, false), 'getPostId', 'The wp_posts row this entity projects to.'),
+                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'Projected to post_title, so the admin list has something to show.'),
+                'dateAdded' => new FieldEntry('dateAdded', new GraphQLType('String', true, false), 'getDateAdded', 'When this instance entered inventory.'),
+                'item' => new FieldEntry('item', new GraphQLType('ClogItem', false, false), 'getItem', 'What this entry is an instance of.'),
+                'location' => new FieldEntry('location', new GraphQLType('ClogLocation', false, false), 'getLocation', 'Where it is kept.'),
+            ],
+            [],
+            'One stocked instance of an item, in a location.',
+        ),
         'ClogItem' => new ObjectTypeEntry(
             'ClogItem',
             'Item',
@@ -55,6 +71,20 @@ return new Manifest(
 
     ],
     mutations: [
+        'createClogInventory' => new MutationEntry(
+            'createClogInventory',
+            'create',
+            'Inventory',
+            [
+                'createdAt' => new GraphQLType('String', true, false),
+                'updatedAt' => new GraphQLType('String', false, false),
+                'postId' => new GraphQLType('Int', false, false),
+                'name' => new GraphQLType('String', true, false),
+                'dateAdded' => new GraphQLType('String', true, false),
+            ],
+            null,
+            'Create a ClogInventory.',
+        ),
         'createClogItem' => new MutationEntry(
             'createClogItem',
             'create',
@@ -81,6 +111,20 @@ return new Manifest(
             ],
             null,
             'Create a ClogLocation.',
+        ),
+        'updateClogInventory' => new MutationEntry(
+            'updateClogInventory',
+            'update',
+            'Inventory',
+            [
+                'id' => new GraphQLType('ID', true, false),
+                'updatedAt' => new GraphQLType('String', false, false),
+                'postId' => new GraphQLType('Int', false, false),
+                'name' => new GraphQLType('String', false, false),
+                'dateAdded' => new GraphQLType('String', false, false),
+            ],
+            null,
+            'Update a ClogInventory.',
         ),
         'updateClogItem' => new MutationEntry(
             'updateClogItem',
@@ -111,6 +155,7 @@ return new Manifest(
         ),
     ],
     roots: [
+        'ClogInventory' => new RootFieldEntry('ClogInventory', 'ClogInventoryEntries', 'Inventory'),
         'ClogItem' => new RootFieldEntry('ClogItem', 'ClogItems', 'Item'),
         'ClogLocation' => new RootFieldEntry('ClogLocation', 'ClogLocations', 'Location'),
     ],

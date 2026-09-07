@@ -8,22 +8,20 @@ declare(strict_types=1);
  * Regenerate with `eleph generate`. This file is machine-owned: edits are
  * detected by the build and rejected.
  *
- * path:   Location/LocationDeleter.php
- * digest: sha256:dbf8ae8f0aa5441b44c68bd221733baad67ab138ec13a604ab99a0123d22b04d
+ * path:   Inventory/InventoryDeleter.php
+ * digest: sha256:38b3b654a0b20e0d7df4df74440283ba29f804041bfac6a0d72dfc3722bd29fc
  */
 
-namespace Clog\Entity\Location;
+namespace Clog\Entity\Inventory;
 
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Mutation\Deletion;
-use Eleph\Runtime\Storage\DeletionPolicy;
-use Eleph\Runtime\Storage\DeletionRule;
 use Eleph\Runtime\UnitOfWork\UnitOfWork;
 
 /**
- * Removes a Location, and whatever its edges say goes with it.
+ * Removes a Inventory, and whatever its edges say goes with it.
  */
-final class LocationDeleter
+final class InventoryDeleter
 {
     public function __construct(
         private readonly UnitOfWork $work,
@@ -35,7 +33,7 @@ final class LocationDeleter
      */
     public function delete(EntityId $id): void
     {
-        $this->work->delete(new Deletion('Location', $id));
+        $this->work->delete(new Deletion('Inventory', $id));
     }
 
     /**
@@ -43,8 +41,6 @@ final class LocationDeleter
      */
     public static function rules(): array
     {
-        return [
-            new DeletionRule('Inventory', 'location', 'Inventory', DeletionPolicy::Restrict, false),
-        ];
+        return [];
     }
 }

@@ -13,6 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'CLOG_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
+// Composer autoloader — Elephentity and its dependencies. Guarded so a checkout
+// without `composer install` still loads the hand-written plugin code below.
+if ( file_exists( CLOG_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once CLOG_PLUGIN_DIR . 'vendor/autoload.php';
+}
+
 require_once CLOG_PLUGIN_DIR . 'includes/post-types.php';
 require_once CLOG_PLUGIN_DIR . 'includes/meta-fields.php';
 require_once CLOG_PLUGIN_DIR . 'includes/graphql.php';

@@ -154,27 +154,40 @@ itself generates nothing.
 
 ### Framework dependencies
 
-`server/composer.json` currently resolves the three Elephentity packages from **path
-repositories** — sibling checkouts of `elephentity`, `elephentity-codegen` and
-`elephentity-codegen-php` next to this one — so framework changes can be developed
-against Clog. `scripts/php.sh` mounts them, and refuses to start if any is missing.
+The three Elephentity packages come from Packagist: `elephentity/elephentity` is
+the runtime and the WordPress and WPGraphQL adaptors, and `elephentity/codegen`
+and `elephentity/codegen-php` are build-time only, so they are dev dependencies
+and `composer install --no-dev` leaves them out of a deployed plugin.
 
-They are copied rather than symlinked (`"symlink": false`), because Composer symlinks
-path repositories *relatively*: `server/vendor/elephentity/elephentity` would point at
-`../../../../elephentity`, which resolves on the host but inside the WordPress
-container — where `server` is mounted four levels below `wp-content` — resolves to a
-path that does not exist, and PHP fatals on the dangling link. The cost of copying is
-that framework changes need `scripts/php.sh composer update elephentity/*` to
-propagate.
+To develop a framework change against Clog, point `server/composer.json` at a
+local checkout instead:
 
-**Before this reaches a branch anyone else installs from**, swap the path repositories
-for the published packages: drop the `repositories` block, set
-`"elephentity/elephentity": "^0.1.0"` and the same for `elephentity/codegen` and
-`elephentity/codegen-php`, restore `"minimum-stability": "stable"`, then re-track
-`server/composer.lock` (it is gitignored while the path repositories are in place,
-since a lock built from them pins local commits and is installable nowhere else).
-`.github/workflows/deploy.yml` runs `composer install --no-dev` against `server/`
-alone and needs that swap to have happened.
+```json
+"repositories": [
+    { "type": "path", "url": "../../elephentity", "options": { "symlink": false } }
+],
+```
+
+Three things about that, all of which will otherwise cost you an afternoon:
+
+- `"symlink": false` is not the default and matters. Composer symlinks path
+  repositories *relatively*, so `server/vendor/elephentity/elephentity` would
+  point at `../../../../elephentity` — which resolves on the host, but inside the
+  WordPress container, where `server` is mounted four levels below `wp-content`,
+  resolves to a path that does not exist. PHP then fatals on the dangling link.
+  Copying instead means framework changes need
+  `scripts/php.sh composer update elephentity/*` to propagate.
+- Composer takes a path repository's version from the *branch*, not the tag, so a
+  checkout sitting on a release tag still reports `dev-main` and
+  `"minimum-stability": "stable"` refuses it. Set it to `dev`, keeping
+  `"prefer-stable": true`.
+- `scripts/php.sh` mounts only this repository, so add a mount for the checkout at
+  the position the relative path expects.
+
+Revert all of it before pushing, and do not commit the lock file a path
+repository produces — it pins a local commit and is installable on no other
+machine. `.github/workflows/deploy.yml` runs `composer install --no-dev` against
+`server/` alone, and a path repository is exactly what it cannot resolve.
 
 ---
 

@@ -18,16 +18,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PARENT="$(dirname "$ROOT")"
 
 IMAGE="clog-php:8.3"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/clog/composer"
-
-# The framework checkouts server/composer.json points at as path repositories.
-# Composer resolves those relative to server/, so they have to be mounted at the
-# same relative position they occupy on the host — hence /work/<name> alongside
-# /work/clog, rather than each one somewhere convenient.
-SIBLINGS=(elephentity elephentity-codegen elephentity-codegen-php)
 
 if command -v podman >/dev/null 2>&1; then
     ENGINE=podman
@@ -43,17 +36,6 @@ if ! "$ENGINE" image inspect "$IMAGE" >/dev/null 2>&1; then
     echo "Building $IMAGE (first run only)..." >&2
     "$ENGINE" build -t "$IMAGE" -f "$ROOT/.docker/php/Dockerfile" "$ROOT/.docker/php"
 fi
-
-MOUNTS=(-v "$ROOT:/work/clog:z")
-for sibling in "${SIBLINGS[@]}"; do
-    if [ ! -d "$PARENT/$sibling" ]; then
-        echo "scripts/php.sh: $PARENT/$sibling is missing." >&2
-        echo "  server/composer.json requires it as a path repository. Clone it beside this" >&2
-        echo "  checkout, or swap the path repositories for Packagist constraints." >&2
-        exit 1
-    fi
-    MOUNTS+=(-v "$PARENT/$sibling:/work/$sibling:z")
-done
 
 # Run as the host user so nothing in the working tree ends up owned by root.
 # Rootless podman already maps the host user, and passing --user there would
@@ -76,8 +58,8 @@ fi
 exec "$ENGINE" run --rm \
     "${TTY_ARGS[@]}" \
     "${USER_ARGS[@]}" \
-    `# :z relabels the mounts for SELinux, which Fedora enforces by default.` \
-    "${MOUNTS[@]}" \
+    `# :z relabels the mount for SELinux, which Fedora enforces by default.` \
+    -v "$ROOT:/work/clog:z" \
     -v "$CACHE_DIR:/composer:z" \
     -e COMPOSER_HOME=/composer \
     `# An arbitrary UID has no passwd entry, so HOME is unset and some tools fall over.` \

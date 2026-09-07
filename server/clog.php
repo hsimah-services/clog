@@ -5,6 +5,8 @@
  * Version: 1.0.0
  * Author: hsimah
  * Text Domain: clog
+ * Requires Plugins: wp-graphql, wp-graphql-jwt-authentication
+ * Requires at least: 6.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

@@ -47,8 +47,17 @@ else
 fi
 wp plugin install wp-redis --activate --allow-root
 
-# Activate the local clog plugin (mounted via volume, not installed via WP-CLI)
-wp plugin activate clog --allow-root 2>/dev/null || echo "Could not activate: clog"
+# Activate the local clog plugin (mounted via volume, not installed via WP-CLI).
+#
+# Not fatal — apache is already backgrounded, so exiting here would take the whole
+# dev stack down and with it the logs explaining why. But stderr is kept: clog
+# declares its dependencies in the plugin header, and WP-CLI naming the unmet one
+# is the entire point of declaring them.
+if ! wp plugin activate clog --allow-root; then
+  echo "!! Could not activate the clog plugin (stack is still up)." >&2
+  echo "!! If that was an unmet dependency, check what is active:" >&2
+  echo "!!   wp plugin list --allow-root" >&2
+fi
 
 # Set permalink structure (required for WPGraphQL pretty URLs)
 wp rewrite structure '/%postname%/' --allow-root 2>/dev/null || true

@@ -11,6 +11,7 @@ use Eleph\Runtime\Gateway\Runtime;
 use Eleph\Runtime\Gateway\UnitOfWorkFactory;
 use Eleph\WordPress\Database\WpdbDatabase;
 use Eleph\WordPress\Manifest\StorageManifest;
+use Eleph\WordPress\Registration\PostTypeRegistrar;
 use Eleph\WordPress\WordPress;
 use Eleph\WordPress\WordPressAdaptor;
 use Psr\Log\LoggerInterface;
@@ -30,6 +31,21 @@ use wpdb;
  */
 final class Clog
 {
+    /**
+     * Each manifest sits in its own target's directory, inside the PHP tree.
+     *
+     * They used to be two files at the root of `generated/`, produced by the same run
+     * that produced the entity classes. They are now produced by a target each — the
+     * PHP builder cannot compile a storage schema, because that needs code that knows
+     * what a table is — so a project that installs neither the driver nor the
+     * integration has neither directory. The paths are relative to `$generated`.
+     */
+    private const STORAGE_MANIFEST = 'wordpress/storage-manifest.php';
+
+    private const GRAPHQL_MANIFEST = 'wpgraphql/graphql-manifest.php';
+
+    private const POST_TYPES = 'wordpress/post-types.php';
+
     private static ?self $instance = null;
 
     private ?EntityGateway $gateway = null;
@@ -108,11 +124,23 @@ final class Clog
 
     private function manifest(): StorageManifest
     {
-        return $this->manifest ??= WordPress::manifest($this->generated . 'storage-manifest.php');
+        return $this->manifest ??= WordPress::manifest($this->generated . self::STORAGE_MANIFEST);
     }
 
     public function graphqlManifestPath(): string
     {
-        return $this->generated . 'graphql-manifest.php';
+        return $this->generated . self::GRAPHQL_MANIFEST;
+    }
+
+    /**
+     * The post types the spec compiled to. Hook `register()` on `init`.
+     *
+     * Compiled, not derived: registration used to be a hand-written list in
+     * `includes/post-types.php` that had to be kept in step with the spec by hand, and
+     * before that the framework derived it per request from the spec compiler.
+     */
+    public function postTypes(): PostTypeRegistrar
+    {
+        return PostTypeRegistrar::fromManifest($this->generated . self::POST_TYPES);
     }
 }

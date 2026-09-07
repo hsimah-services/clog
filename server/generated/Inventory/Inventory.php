@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/Inventory.php
- * digest: sha256:df12c7e2a644e12f705e0e9aad5d51b5410a148fddf2a7c446ac7ea1a807895b
+ * digest: sha256:cc2b5cefdffbe0915e015d42c975a4b3ed455613083ebb708110b1f5ff39c7fe
  */
 
 namespace Clog\Entity\Inventory;
@@ -80,7 +80,10 @@ final class Inventory
      */
     public function getItem(): ?Item
     {
-        return $this->edges->toOne('Inventory', $this->id, 'item');
+        $related = $this->edges->toOne('Inventory', $this->id, 'item');
+        assert(null === $related || $related instanceof Item);
+
+        return $related;
     }
 
     /**
@@ -88,7 +91,10 @@ final class Inventory
      */
     public function getLocation(): ?Location
     {
-        return $this->edges->toOne('Inventory', $this->id, 'location');
+        $related = $this->edges->toOne('Inventory', $this->id, 'location');
+        assert(null === $related || $related instanceof Location);
+
+        return $related;
     }
 
     public static function of(

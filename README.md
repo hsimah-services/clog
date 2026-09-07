@@ -30,8 +30,10 @@ Node all run inside containers, so nothing needs to be installed on the host.
   client/               # React/Vite SPA (frontend)
   server/               # WordPress plugin (`plugins/clog`) and themes
   .docker/wordpress/    # WordPress image: WP-CLI, Redis ext, first-run install script
+  .docker/php/          # PHP 8.3 build image: composer and the eleph commands, no service
   docker-compose.yml    # brings up WordPress, MySQL, Redis, Mailpit, PhpMyAdmin, and the client dev server
   scripts/dev.sh        # single entry point for the dev stack (up/down/logs/reset/wp)
+  scripts/php.sh        # single entry point for build-time PHP (composer, eleph)
   .env.example          # committed template for .env
   .env                  # local environment (ignored by git)
   CLAUDE.md             # coding conventions / developer handbook
@@ -107,6 +109,72 @@ Node all run inside containers, so nothing needs to be installed on the host.
    scripts/dev.sh down     # stop, keep the database
    scripts/dev.sh reset    # stop and destroy the database and WP install
    ```
+
+---
+
+## Server: the entity build loop
+
+`server/` is an [Elephentity](https://github.com/hsimah-services/elephentity) project.
+The entity classes, the storage manifest, the post types and the GraphQL surface under
+`server/generated/` are compiled from the YAML in `server/spec/` — machine-owned,
+signed by digest, committed, and never hand-edited.
+
+Generation needs PHP 8.3 and there is none on the host, so it runs in a throwaway
+container:
+
+```bash
+scripts/php.sh composer install
+scripts/php.sh vendor/bin/eleph generate --project .
+```
+
+The working directory inside the container is `server/`, so every command in the build
+loop is written as if you were standing there. The container is created per command and
+removed on exit — deliberately not part of `docker-compose.yml`, because generating
+code is a build step and must not need the runtime stack to be up.
+
+The loop is: change `spec/`, regenerate, implement whatever appeared under
+`generated/*/Contract/`. The gates, in the order worth running them:
+
+| Command | Answers |
+|---|---|
+| `scripts/php.sh vendor/bin/eleph-codegen doctor --project .` | are the builders installed and runnable? |
+| `scripts/php.sh vendor/bin/eleph fmt --project .` | is the spec in canonical form? |
+| `scripts/php.sh vendor/bin/eleph validate spec` | is the spec valid? |
+| `scripts/php.sh vendor/bin/eleph generate --project .` | compile it |
+| `scripts/php.sh vendor/bin/eleph generate --check --project .` | is `generated/` what the spec says, byte for byte? |
+| `scripts/php.sh vendor/bin/eleph check --project .` | does every exposed GraphQL field resolve? |
+
+`doctor` is the one to run first when anything is confusing: it resolves every
+configured builder and says where it found it, without needing a compiled spec.
+
+Three targets are configured in `server/eleph.json`, one per program that produces
+output — `eleph-gen-php` for the entity classes, `eleph-gen-wordpress` for the storage
+manifest and post types, `eleph-gen-wpgraphql` for the GraphQL manifest. The framework
+itself generates nothing.
+
+### Framework dependencies
+
+`server/composer.json` currently resolves the three Elephentity packages from **path
+repositories** — sibling checkouts of `elephentity`, `elephentity-codegen` and
+`elephentity-codegen-php` next to this one — so framework changes can be developed
+against Clog. `scripts/php.sh` mounts them, and refuses to start if any is missing.
+
+They are copied rather than symlinked (`"symlink": false`), because Composer symlinks
+path repositories *relatively*: `server/vendor/elephentity/elephentity` would point at
+`../../../../elephentity`, which resolves on the host but inside the WordPress
+container — where `server` is mounted four levels below `wp-content` — resolves to a
+path that does not exist, and PHP fatals on the dangling link. The cost of copying is
+that framework changes need `scripts/php.sh composer update elephentity/*` to
+propagate.
+
+**Before this reaches a branch anyone else installs from**, swap the path repositories
+for the published packages: drop the `repositories` block, set
+`"elephentity/elephentity": "^0.1.0"` and the same for `elephentity/codegen` and
+`elephentity/codegen-php`, restore `"minimum-stability": "stable"`, then re-track
+`server/composer.lock` (it is gitignored while the path repositories are in place,
+since a lock built from them pins local commits and is installable nowhere else).
+`.github/workflows/deploy.yml` runs `composer install --no-dev` against `server/`
+alone and needs that swap to have happened.
 
 ---
 

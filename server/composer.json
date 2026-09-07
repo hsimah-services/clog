@@ -5,15 +5,36 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/hsimah/elephentity"
+            "type": "path",
+            "url": "../../elephentity",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../elephentity-codegen",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../elephentity-codegen-php",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {
         "php": ">=8.3",
-        "elephentity/elephentity": "0.0.1"
+        "elephentity/elephentity": "*"
     },
-    "minimum-stability": "stable",
+    "require-dev": {
+        "elephentity/codegen": "*",
+        "elephentity/codegen-php": "*"
+    },
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "platform": {

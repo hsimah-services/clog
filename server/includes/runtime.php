@@ -46,24 +46,3 @@ function clog_boot_graphql(): void {
 function clog_install_tables(): array {
 	return Clog::instance()->tables()->install();
 }
-
-/**
- * Format DateTimeImmutable values on their way out through GraphQL.
- *
- * Elephentity maps a `datetime` field to the GraphQL type `String`, but its resolver
- * hands back whatever the getter returns — and the generated getter returns a
- * DateTimeImmutable. Every query selecting createdAt, updatedAt or dateAdded therefore
- * fails with "String cannot represent value: instance of DateTimeImmutable".
- *
- * WPGraphQL runs every resolved value through this filter, so the coercion can be
- * applied in one place without re-registering fields or reaching into the manifest.
- * ISO 8601, which is what the previous hand-written resolvers emitted and what the
- * client parses.
- *
- * Remove once the framework's resolver formats what it declared as a String.
- */
-add_filter( 'graphql_resolve_field', 'clog_format_graphql_datetimes', 10, 1 );
-
-function clog_format_graphql_datetimes( $value ) {
-	return $value instanceof DateTimeInterface ? $value->format( DateTimeInterface::ATOM ) : $value;
-}

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:dbab82e7ab14529aff190bc925b7f9a4c1fcaa3928844c67e6ccec69183bd025
+ * digest: sha256:2fbc36c545f7a22de542aa600d7922577c284d2df505ed4b9ebbaab62c6ecf65
  */
 
 namespace Eleph\WordPress\Manifest;
@@ -18,7 +18,7 @@ use Eleph\WordPress\Sql\Column;
 use Eleph\WordPress\Sql\EdgePlacement;
 use Eleph\WordPress\Sql\Index;
 use Eleph\WordPress\Sql\TableSchema;
-use Eleph\Schema\Ir\RelationKind;
+use Eleph\Runtime\Storage\RelationKind;
 
 /**
  * The compiled physical schema.
@@ -106,5 +106,8 @@ return new StorageManifest(
         'Inventory' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'dateAdded' => 'date_added'],
         'Item' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'barcode' => 'barcode'],
         'Location' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name'],
+    ],
+    joinTables: [
+
     ],
 );

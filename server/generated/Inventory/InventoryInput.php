@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryInput.php
- * digest: sha256:1385a399240ed5a2f685156e8ba4e9c8888c16ac23741f30bc30767ae6831921
+ * digest: sha256:4768f6e0b61459494f4e93d2f9fd5c7fe391809fcb48dfa52443753c87b1080a
  */
 
 namespace Clog\Entity\Inventory;
 
 use DateTimeImmutable;
+use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\MutationBuffer;
 use Eleph\Runtime\Query\ValueDecoder;
+use InvalidArgumentException;
 
 /**
  * Turns raw input into pending Inventory changes.
@@ -74,6 +76,30 @@ final readonly class InventoryInput
     }
 
     /**
+     * @return list<Identifier>
+     */
+    private function item(mixed $value): array
+    {
+        if (null === $value) {
+            return [];
+        }
+
+        return [$this->decode->id($value, 'Inventory.item')];
+    }
+
+    /**
+     * @return list<Identifier>
+     */
+    private function location(mixed $value): array
+    {
+        if (null === $value) {
+            return [];
+        }
+
+        return [$this->decode->id($value, 'Inventory.location')];
+    }
+
+    /**
      * Only what the caller supplied. A key that is absent is left alone,
      * which is what makes a partial update partial.
      *
@@ -99,6 +125,14 @@ final readonly class InventoryInput
 
         if (array_key_exists('dateAdded', $input)) {
             $buffer->set('dateAdded', $this->dateAdded($input['dateAdded']));
+        }
+
+        if (array_key_exists('item', $input)) {
+            $buffer->edge('item')->set($this->item($input['item']));
+        }
+
+        if (array_key_exists('location', $input)) {
+            $buffer->edge('location')->set($this->location($input['location']));
         }
     }
 }

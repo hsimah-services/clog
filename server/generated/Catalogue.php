@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:46e1f07582af6518106b49ea998be2c74076c751d1bbaf43428b2da2309e1db8
+ * digest: sha256:455fd785364d4949615b2caeeb572b91a0e361c9a815f03ea713836b8fd761ed
  */
 
 namespace Clog\Entity;
@@ -134,6 +134,40 @@ final readonly class Catalogue implements EntityCatalogue
             'Location' => ['createdAt', 'updatedAt', 'postId', 'name'],
             default => [],
         };
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function requiredFields(string $entity): array
+    {
+        return match ($entity) {
+            'Inventory' => ['createdAt', 'name', 'dateAdded'],
+            'Item' => ['createdAt', 'name'],
+            'Location' => ['createdAt', 'name'],
+            default => [],
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function uniqueFields(string $entity): array
+    {
+        return match ($entity) {
+            'Inventory' => ['postId'],
+            'Item' => ['postId', 'barcode'],
+            'Location' => ['postId', 'name'],
+            default => [],
+        };
+    }
+
+    /**
+     * @return array<string, Managed> "Entity.field" => policy
+     */
+    public function managedFields(): array
+    {
+        return [];
     }
 
     /**

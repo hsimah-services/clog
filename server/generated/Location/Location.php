@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/Location.php
- * digest: sha256:793fe8fe7c017398dfbd16c1584f2da6debd17af0b8cfea96f5f107b759c1b5b
+ * digest: sha256:2f1f527ab19b6c6c586f31bc6e5366e6901ef5ea4da78f4c59b476ee81d26206
  */
 
 namespace Clog\Entity\Location;
 
+use Clog\Entity\Inventory\Inventory;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EdgeLoader;
+use Eleph\Runtime\Query\EntityQuery;
 
 /**
  * Somewhere inventory can be kept.
@@ -62,6 +64,19 @@ final class Location
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * Every Inventory whose "location" points here.
+     *
+     * @return EntityQuery<Inventory>
+     */
+    public function inventoryEntries(): EntityQuery
+    {
+        /** @var EntityQuery<Inventory> $related */
+        $related = $this->edges->inverseToMany('Inventory', 'location', $this->id);
+
+        return $related;
     }
 
     public static function of(

@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/Item.php
- * digest: sha256:5230a0b21b408a72522fc98e1a09d26c0a0aff00c6f2955b628ea2d3ccce78c2
+ * digest: sha256:d876539297ab8e81e40d10b10c22020c52de43ebec83fcf18708efbb34e70515
  */
 
 namespace Clog\Entity\Item;
 
+use Clog\Entity\Inventory\Inventory;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EdgeLoader;
+use Eleph\Runtime\Query\EntityQuery;
 
 /**
  * A thing that can be stocked, identified by its barcode.
@@ -71,6 +73,19 @@ final class Item
     public function getBarcode(): ?string
     {
         return $this->barcode;
+    }
+
+    /**
+     * Every Inventory whose "item" points here.
+     *
+     * @return EntityQuery<Inventory>
+     */
+    public function inventoryEntries(): EntityQuery
+    {
+        /** @var EntityQuery<Inventory> $related */
+        $related = $this->edges->inverseToMany('Inventory', 'item', $this->id);
+
+        return $related;
     }
 
     public static function of(

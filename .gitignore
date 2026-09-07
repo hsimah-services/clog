@@ -43,3 +43,9 @@ client/tsconfig.e2e.tsbuildinfo
 
 # Composer
 /server/vendor/
+
+# server/composer.json currently points at ../../elephentity* as path repositories,
+# so the lock this produces pins dev-main commits of three local checkouts and is
+# installable on no other machine. Re-track it when those are swapped back for
+# Packagist constraints (see the Building section of README.md).
+/server/composer.lock

@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryMutator.php
- * digest: sha256:57acad67e773c5b326fb813f1618bd8415beb23f3e73d0be972d6866938546ac
+ * digest: sha256:48827f37413938332219684ea1585b79adf63f55a2622eba4f44ef99fc382ddf
  */
 
 namespace Clog\Entity\Inventory;
 
 use DateTimeImmutable;
+use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\MutationBuffer;
 
 /**
@@ -51,6 +52,26 @@ final class InventoryMutator
     public function setDateAdded(DateTimeImmutable $dateAdded): self
     {
         $this->buffer->set('dateAdded', $dateAdded);
+
+        return $this;
+    }
+
+    /**
+     * Point this at one Item, or at nothing.
+     */
+    public function setItem(?Identifier $item): self
+    {
+        $this->buffer->edge('item')->set(null === $item ? [] : [$item]);
+
+        return $this;
+    }
+
+    /**
+     * Point this at one Location, or at nothing.
+     */
+    public function setLocation(?Identifier $location): self
+    {
+        $this->buffer->edge('location')->set(null === $location ? [] : [$location]);
 
         return $this;
     }

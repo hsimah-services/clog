@@ -1,78 +1,32 @@
 <?php
 /**
- * Register custom post types for Clog.
+ * Register Clog's post types from the compiled manifest.
+ *
+ * This file used to carry the registration arguments by hand — three
+ * `register_post_type()` calls whose labels and slugs had to be kept in step with
+ * `spec/entities/` by whoever remembered. They are now compiled: the `wordpress`
+ * target emits `generated/wordpress/post-types.php`, and registering them is a loop
+ * over it.
+ *
+ * Registering the type is all this does. Nothing here creates or maintains a post
+ * row — the custom table is the entity.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Clog\Runtime\Clog;
+
 add_action( 'init', 'clog_register_post_types' );
 
 function clog_register_post_types(): void {
-	// Item
-	register_post_type( 'clog_item', [
-		'labels'       => [
-			'name'               => __( 'Items', 'clog' ),
-			'singular_name'      => __( 'Item', 'clog' ),
-			'add_new_item'       => __( 'Add New Item', 'clog' ),
-			'edit_item'          => __( 'Edit Item', 'clog' ),
-			'new_item'           => __( 'New Item', 'clog' ),
-			'view_item'          => __( 'View Item', 'clog' ),
-			'search_items'       => __( 'Search Items', 'clog' ),
-			'not_found'          => __( 'No items found', 'clog' ),
-			'not_found_in_trash' => __( 'No items found in Trash', 'clog' ),
-		],
-		'public'              => false,
-		'show_ui'             => true,
-		'show_in_rest'        => true,
-		'publicly_queryable'  => false,
-		'exclude_from_search' => true,
-		'show_in_menu' => 'clog',
-		'supports'     => [ 'title', 'custom-fields' ],
-	] );
+	// Guarded like the GraphQL boot is: a checkout without `composer install` still
+	// loads the rest of the plugin, and an admin screen is a worse place to discover
+	// a missing autoloader than the error log.
+	if ( ! class_exists( Clog::class ) ) {
+		return;
+	}
 
-	// Location
-	register_post_type( 'clog_location', [
-		'labels'       => [
-			'name'               => __( 'Locations', 'clog' ),
-			'singular_name'      => __( 'Location', 'clog' ),
-			'add_new_item'       => __( 'Add New Location', 'clog' ),
-			'edit_item'          => __( 'Edit Location', 'clog' ),
-			'new_item'           => __( 'New Location', 'clog' ),
-			'view_item'          => __( 'View Location', 'clog' ),
-			'search_items'       => __( 'Search Locations', 'clog' ),
-			'not_found'          => __( 'No locations found', 'clog' ),
-			'not_found_in_trash' => __( 'No locations found in Trash', 'clog' ),
-		],
-		'public'              => false,
-		'show_ui'             => true,
-		'show_in_rest'        => true,
-		'publicly_queryable'  => false,
-		'exclude_from_search' => true,
-		'show_in_menu' => 'clog',
-		'supports'     => [ 'title', 'custom-fields' ],
-	] );
-
-	// Inventory
-	register_post_type( 'clog_inventory', [
-		'labels'       => [
-			'name'               => __( 'Inventory', 'clog' ),
-			'singular_name'      => __( 'Inventory Entry', 'clog' ),
-			'add_new_item'       => __( 'Add Inventory Entry', 'clog' ),
-			'edit_item'          => __( 'Edit Inventory Entry', 'clog' ),
-			'new_item'           => __( 'New Inventory Entry', 'clog' ),
-			'view_item'          => __( 'View Inventory Entry', 'clog' ),
-			'search_items'       => __( 'Search Inventory', 'clog' ),
-			'not_found'          => __( 'No inventory entries found', 'clog' ),
-			'not_found_in_trash' => __( 'No inventory entries found in Trash', 'clog' ),
-		],
-		'public'              => false,
-		'show_ui'             => true,
-		'show_in_rest'        => true,
-		'publicly_queryable'  => false,
-		'exclude_from_search' => true,
-		'show_in_menu' => 'clog',
-		'supports'     => [ 'title', 'custom-fields' ],
-	] );
+	Clog::instance()->postTypes()->register();
 }

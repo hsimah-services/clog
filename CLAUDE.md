@@ -5,7 +5,7 @@ Clog (Cave Log) is a React + TypeScript inventory management system for tracking
 
 ## Deployment
 
-- **space-needle**: The production home server running a self-hosted GitHub Actions runner
+- **space-needle**: The production home server, running pupyrus. CI/CD runs on GitHub-hosted runners, not on space-needle.
 - **pupyrus**: The WordPress Docker container running on space-needle
 - Publishing a GitHub release builds the plugin and attaches an installable zip to the release (`.github/workflows/deploy.yml`). Pupyrus is not touched automatically — its WordPress admin (`server/includes/updates.php`, backed by `yahnis-elsts/plugin-update-checker`) polls GitHub releases and shows an "Update available" prompt on the Plugins page; deploying is a manual "Update Now" click there.
 

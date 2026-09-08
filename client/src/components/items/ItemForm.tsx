@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, ScanBarcode } from 'lucide-react';
+import { ScanBarcode } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -8,66 +8,34 @@ import { Select } from '@/components/ui/Select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { BarcodeScannerDialog } from '@/components/barcode/BarcodeScannerDialog';
 import { useData } from '@/context/DataContext';
-import { calcExpiryDate } from '@/lib/utils';
-import type { Item, DefaultExpiry } from '@/types';
+import type { Item } from '@/types';
 
 interface ItemFormProps {
   item?: Item;
-  initialBarcodes?: string[];
+  initialBarcode?: string;
 }
 
-export function ItemForm({ item, initialBarcodes }: ItemFormProps) {
+export function ItemForm({ item, initialBarcode }: ItemFormProps) {
   const navigate = useNavigate();
   const { addItem, updateItem, locations, addInventory } = useData();
   const [name, setName] = useState(item?.name ?? '');
-  const [barcodes, setBarcodes] = useState<string[]>(
-    item ? [...(item.barcodes ?? []), ''] : initialBarcodes?.length ? [...initialBarcodes] : []
-  );
-  const [isManualMode, setIsManualMode] = useState(!!item);
+  const [barcode, setBarcode] = useState(item?.barcode ?? initialBarcode ?? '');
   const [scannerOpen, setScannerOpen] = useState(false);
-  const [expiryValue, setExpiryValue] = useState(item?.defaultExpiry?.value.toString() ?? '');
-  const [expiryUnit, setExpiryUnit] = useState<'days' | 'months'>(item?.defaultExpiry?.unit ?? 'days');
   const [locationId, setLocationId] = useState('');
   const [count, setCount] = useState('');
 
-  const updateBarcode = (index: number, value: string) => {
-    const updated = [...barcodes];
-    updated[index] = value;
-    if (index === updated.length - 1 && value !== '') {
-      updated.push('');
-    }
-    setBarcodes(updated);
-  };
-
-  const removeBarcode = (index: number) => {
-    const updated = barcodes.filter((_, i) => i !== index);
-    if (isManualMode && (updated.length === 0 || updated[updated.length - 1] !== '')) {
-      updated.push('');
-    }
-    setBarcodes(updated);
-  };
-
-  const handleScan = (barcode: string) => {
-    setBarcodes((prev) => [...prev, barcode]);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filteredBarcodes = barcodes.filter((b) => b.trim() !== '');
-    const parsedExpiry = parseInt(expiryValue, 10);
-    const defaultExpiry: DefaultExpiry | null = parsedExpiry > 0
-      ? { unit: expiryUnit, value: parsedExpiry }
-      : null;
+    const trimmedBarcode = barcode.trim() || null;
     if (item) {
-      await updateItem(item.id, { name, barcodes: filteredBarcodes, defaultExpiry });
+      await updateItem(item.id, { name, barcode: trimmedBarcode });
       navigate(`/items/${item.id}`);
     } else {
-      const newItem = await addItem({ name, barcodes: filteredBarcodes, defaultExpiry });
+      const newItem = await addItem({ name, barcode: trimmedBarcode });
       if (locationId) {
         const itemCount = parseInt(count, 10) || 0;
-        const dateExpiry = defaultExpiry ? calcExpiryDate(defaultExpiry) : null;
         for (let i = 0; i < itemCount; i++) {
-          await addInventory({ itemId: newItem.id, locationId, dateAdded: new Date(), dateExpiry });
+          await addInventory({ itemId: newItem.id, locationId, dateAdded: new Date() });
         }
       }
       navigate(`/items/${newItem.id}`);
@@ -92,97 +60,24 @@ export function ItemForm({ item, initialBarcodes }: ItemFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Barcodes</Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      if (!isManualMode) {
-                        setIsManualMode(true);
-                        if (barcodes.length === 0 || barcodes[barcodes.length - 1] !== '') {
-                          setBarcodes((prev) => [...prev, '']);
-                        }
-                      } else {
-                        setIsManualMode(false);
-                        setBarcodes((prev) => prev.filter((b) => b.trim() !== ''));
-                      }
-                    }}
-                  >
-                    {isManualMode ? 'Use scanner' : 'Set manually'}
-                  </Button>
-                </div>
-                {isManualMode ? (
-                  barcodes.map((barcode, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={barcode}
-                        onChange={(e) => updateBarcode(index, e.target.value)}
-                        placeholder="Enter barcode"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeBarcode(index)}
-                        disabled={barcodes.length === 1 && barcode === ''}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="space-y-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setScannerOpen(true)}
-                      className="w-full"
-                    >
-                      <ScanBarcode className="mr-2 h-4 w-4" />
-                      Scan Barcode
-                    </Button>
-                    {barcodes.length > 0 && (
-                      <ul className="space-y-1">
-                        {barcodes.map((barcode, index) => (
-                          <li key={index} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm font-mono">
-                            {barcode}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => removeBarcode(index)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>Default Expiry (optional)</Label>
+                <Label htmlFor="barcode">Barcode (optional)</Label>
                 <div className="flex gap-2">
                   <Input
-                    type="number"
-                    min="0"
-                    value={expiryValue}
-                    onChange={(e) => setExpiryValue(e.target.value)}
-                    placeholder="e.g. 6"
-                    className="max-w-[120px]"
+                    id="barcode"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    placeholder="Enter barcode"
+                    className="font-mono"
                   />
-                  <Select
-                    value={expiryUnit}
-                    onChange={(e) => setExpiryUnit(e.target.value as 'days' | 'months')}
-                    className="max-w-[120px]"
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setScannerOpen(true)}
+                    aria-label="Scan barcode"
                   >
-                    <option value="days">Days</option>
-                    <option value="months">Months</option>
-                  </Select>
+                    <ScanBarcode className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
               {!item && (
@@ -231,7 +126,7 @@ export function ItemForm({ item, initialBarcodes }: ItemFormProps) {
       <BarcodeScannerDialog
         open={scannerOpen}
         onOpenChange={setScannerOpen}
-        onScan={handleScan}
+        onScan={setBarcode}
       />
     </>
   );

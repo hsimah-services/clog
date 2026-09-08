@@ -23,7 +23,7 @@ export function ItemDetails({ item }: ItemDetailsProps) {
   };
 
   const handleScanBarcode = async (barcode: string) => {
-    await updateItem(item.id, { barcodes: [...item.barcodes, barcode] });
+    await updateItem(item.id, { barcode });
   };
 
   return (
@@ -37,14 +37,8 @@ export function ItemDetails({ item }: ItemDetailsProps) {
         content={
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground">Barcodes</p>
-              <p className="font-mono">
-                {item.barcodes.length > 0 ? item.barcodes.join(', ') : 'None'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Default Expiry</p>
-              <p>{item.defaultExpiry ? `${item.defaultExpiry.value} ${item.defaultExpiry.unit}` : 'None'}</p>
+              <p className="text-sm text-muted-foreground">Barcode</p>
+              <p className="font-mono">{item.barcode ?? 'None'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Created</p>
@@ -53,7 +47,7 @@ export function ItemDetails({ item }: ItemDetailsProps) {
             <div className="flex gap-2">
               <Button onClick={() => navigate(`/items/${item.id}/edit`)}>Edit</Button>
               <Button variant="outline" onClick={() => setScannerOpen(true)}>
-                Add Barcode
+                Scan Barcode
               </Button>
               <Button variant="destructive" onClick={handleDelete}>
                 Delete

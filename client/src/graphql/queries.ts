@@ -14,7 +14,7 @@ export const GET_ITEMS = gql`
 
 export const GET_ITEM = gql`
   query GetItem($id: ID!) {
-    clogItem(id: $id, idType: DATABASE_ID) {
+    clogItem(id: $id) {
       ...ItemFields
     }
   }
@@ -34,7 +34,7 @@ export const GET_LOCATIONS = gql`
 
 export const GET_LOCATION = gql`
   query GetLocation($id: ID!) {
-    clogLocation(id: $id, idType: DATABASE_ID) {
+    clogLocation(id: $id) {
       ...LocationFields
     }
   }
@@ -54,7 +54,7 @@ export const GET_INVENTORY = gql`
 
 export const GET_INVENTORY_ENTRY = gql`
   query GetInventoryEntry($id: ID!) {
-    clogInventory(id: $id, idType: DATABASE_ID) {
+    clogInventory(id: $id) {
       ...InventoryFields
     }
   }

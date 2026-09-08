@@ -54,6 +54,7 @@ services:
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', true);
         define('GRAPHQL_DEBUG', true);
+        define('CLOG_GITHUB_TOKEN', '${CLOG_GITHUB_TOKEN}');
 
   phpmyadmin:
     image: phpmyadmin:latest

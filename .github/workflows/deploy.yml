@@ -1,4 +1,4 @@
-name: Deploy Clog Plugin to Pupyrus
+name: Package Clog Plugin Release
 
 on:
   workflow_dispatch:
@@ -103,9 +103,11 @@ jobs:
         working-directory: .
         run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v
 
-  deploy:
-    runs-on: [self-hosted, space-needle]
+  package:
+    runs-on: ubuntu-latest
     needs: [build, e2e-tests]
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -120,23 +122,32 @@ jobs:
           -e COMPOSER_HOME=/tmp/composer composer:2
           install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Remove old plugin from container
-        run: docker exec pupyrus rm -rf /var/www/html/wp-content/plugins/clog
-
-      - name: Copy plugin to container
-        run: docker cp server pupyrus:/var/www/html/wp-content/plugins/clog
-
-      - name: Activate plugin
+      # WordPress's Plugins page reads this header as the "installed version"
+      # and compares it against the release tag to decide whether an update
+      # is available — it has to match the tag exactly.
+      - name: Stamp plugin version from release tag
+        if: github.event_name == 'release'
         run: |
-          docker compose -f /opt/pupyrus/docker-compose.yml \
-            --profile cli run --rm cli wp plugin activate clog --allow-root
+          sed -i "s/^ \* Version: .*/ * Version: ${{ github.event.release.tag_name }}/" server/clog.php
 
-      - name: Flush rewrite rules
+      - name: Build plugin zip
         run: |
-          docker compose -f /opt/pupyrus/docker-compose.yml \
-            --profile cli run --rm cli wp rewrite flush --allow-root
+          mkdir -p build/clog
+          cp -a server/. build/clog/
+          (cd build && zip -rq ../clog.zip clog)
 
-      - name: Verify plugin status
-        run: |
-          docker compose -f /opt/pupyrus/docker-compose.yml \
-            --profile cli run --rm cli wp plugin status clog --allow-root
+      # Attaching to the release is what lets the self-hosted update checker
+      # (server/includes/updates.php) find it — WordPress downloads this
+      # asset when someone clicks "Update Now" on the Plugins page.
+      - name: Attach zip to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" clog.zip --clobber
+
+      - name: Upload zip as workflow artifact
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clog-plugin
+          path: clog.zip

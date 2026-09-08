@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clog
  * Description: Custom post types for inventory tracking — Items, Locations, and Inventory entries. Exposed via WPGraphQL.
- * Version: 1.0.0
+ * Version: 0.0.3
  * Author: hsimah
  * Text Domain: clog
  * Requires Plugins: wp-graphql, wp-graphql-jwt-authentication
@@ -27,6 +27,7 @@ require_once CLOG_PLUGIN_DIR . 'includes/entity-cli.php';
 require_once CLOG_PLUGIN_DIR . 'includes/admin-menu.php';
 require_once CLOG_PLUGIN_DIR . 'includes/seed-data.php';
 require_once CLOG_PLUGIN_DIR . 'includes/frontend.php';
+require_once CLOG_PLUGIN_DIR . 'includes/updates.php';
 
 register_activation_hook( __FILE__, 'clog_activate' );
 register_deactivation_hook( __FILE__, 'clog_deactivate' );

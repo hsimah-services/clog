@@ -46,6 +46,13 @@ jobs:
         working-directory: .
         run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml down -v 2>/dev/null || true
 
+      - name: Install PHP dependencies
+        working-directory: .
+        run: >
+          docker run --rm -v "$PWD/server:/app" -u "$(id -u):$(id -g)"
+          -e COMPOSER_HOME=/tmp/composer composer:2
+          install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
       - name: Start WordPress stack
         working-directory: .
         run: docker compose -f .github/workflows/e2e-tests/docker-compose.yml up -d --build

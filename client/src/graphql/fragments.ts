@@ -2,31 +2,26 @@ import { gql } from '@apollo/client';
 
 export const ITEM_FIELDS = gql`
   fragment ItemFields on ClogItem {
-    databaseId
-    title
-    date
-    barcodes
-    defaultExpiry {
-      unit
-      value
-    }
+    id
+    name
+    barcode
+    createdAt
   }
 `;
 
 export const LOCATION_FIELDS = gql`
   fragment LocationFields on ClogLocation {
-    databaseId
-    title
-    date
+    id
+    name
+    createdAt
   }
 `;
 
 export const INVENTORY_FIELDS = gql`
   fragment InventoryFields on ClogInventory {
-    databaseId
-    date
+    id
+    createdAt
     dateAdded
-    dateExpiry
     item {
       ...ItemFields
     }

@@ -27,9 +27,12 @@ test.describe('Inventory', () => {
     await page.goto('/clog/inventory');
     await waitForData(page);
 
-    // Click the Heinz Ketchup row to expand it
+    // Click the Heinz Ketchup row to expand it. The row's own cells (item, locations)
+    // are links that stop propagation so they can be followed independently of the
+    // expand toggle — click the chevron cell instead of the row itself so the click
+    // can't land on one of them.
     const ketchupRow = page.getByRole('row').filter({ hasText: 'Heinz Ketchup' });
-    await ketchupRow.click();
+    await ketchupRow.locator('td').first().click();
 
     // Should show sub-rows with location names in cells
     await expect(page.locator('tr.bg-muted\\/50').filter({ hasText: 'Kitchen Cabinet' })).toBeVisible();

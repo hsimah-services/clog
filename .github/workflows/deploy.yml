@@ -114,6 +114,12 @@ jobs:
           name: dist
           path: server/dist/
 
+      - name: Install PHP dependencies
+        run: >
+          docker run --rm -v "$PWD/server:/app" -u "$(id -u):$(id -g)"
+          -e COMPOSER_HOME=/tmp/composer composer:2
+          install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
       - name: Remove old plugin from container
         run: docker exec pupyrus rm -rf /var/www/html/wp-content/plugins/clog
 

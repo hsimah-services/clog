@@ -7,7 +7,7 @@ export function NewItemPage() {
 
   return (
     <div className="max-w-md">
-      <ItemForm initialBarcodes={scannedBarcode ? [scannedBarcode] : undefined} />
+      <ItemForm initialBarcode={scannedBarcode} />
     </div>
   );
 }

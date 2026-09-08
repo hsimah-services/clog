@@ -31,24 +31,22 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 interface GraphQLItem {
-  databaseId: number;
-  title: string;
-  date: string;
-  barcodes: string[] | null;
-  defaultExpiry: { unit: string; value: number } | null;
+  id: string;
+  name: string;
+  barcode: string | null;
+  createdAt: string;
 }
 
 interface GraphQLLocation {
-  databaseId: number;
-  title: string;
-  date: string;
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 interface GraphQLInventory {
-  databaseId: number;
-  date: string;
-  dateAdded: string | null;
-  dateExpiry: string | null;
+  id: string;
+  createdAt: string;
+  dateAdded: string;
   item: GraphQLItem | null;
   location: GraphQLLocation | null;
 }
@@ -79,32 +77,28 @@ interface CreateInventoryData {
 
 function transformItem(gqlItem: GraphQLItem): Item {
   return {
-    id: String(gqlItem.databaseId),
-    name: gqlItem.title,
-    barcodes: gqlItem.barcodes ?? [],
-    defaultExpiry: gqlItem.defaultExpiry
-      ? { unit: gqlItem.defaultExpiry.unit.toLowerCase() as 'days' | 'months', value: gqlItem.defaultExpiry.value }
-      : null,
-    createdAt: new Date(gqlItem.date),
+    id: gqlItem.id,
+    name: gqlItem.name,
+    barcode: gqlItem.barcode,
+    createdAt: new Date(gqlItem.createdAt),
   };
 }
 
 function transformLocation(gqlLocation: GraphQLLocation): Location {
   return {
-    id: String(gqlLocation.databaseId),
-    name: gqlLocation.title,
-    createdAt: new Date(gqlLocation.date),
+    id: gqlLocation.id,
+    name: gqlLocation.name,
+    createdAt: new Date(gqlLocation.createdAt),
   };
 }
 
 function transformInventory(gqlInventory: GraphQLInventory): Inventory {
   return {
-    id: String(gqlInventory.databaseId),
-    itemId: gqlInventory.item ? String(gqlInventory.item.databaseId) : '',
-    locationId: gqlInventory.location ? String(gqlInventory.location.databaseId) : '',
-    dateAdded: gqlInventory.dateAdded ? new Date(gqlInventory.dateAdded) : new Date(gqlInventory.date),
-    dateExpiry: gqlInventory.dateExpiry ? new Date(gqlInventory.dateExpiry) : null,
-    createdAt: new Date(gqlInventory.date),
+    id: gqlInventory.id,
+    itemId: gqlInventory.item?.id ?? '',
+    locationId: gqlInventory.location?.id ?? '',
+    dateAdded: new Date(gqlInventory.dateAdded),
+    createdAt: new Date(gqlInventory.createdAt),
   };
 }
 
@@ -134,13 +128,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const { data } = await createItemMutation({
       variables: {
         input: {
-          title: itemData.name,
-          status: 'PUBLISH',
-          barcodes: itemData.barcodes,
-          ...(itemData.defaultExpiry ? {
-            defaultExpiryUnit: itemData.defaultExpiry.unit.toUpperCase(),
-            defaultExpiryValue: itemData.defaultExpiry.value,
-          } : {}),
+          name: itemData.name,
+          barcode: itemData.barcode,
+          // The schema requires createdAt on every create input even though nothing
+          // else derives it server-side; this is genuinely where it comes from.
+          createdAt: new Date().toISOString(),
         },
       },
     });
@@ -152,17 +144,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       variables: {
         input: {
           id,
-          ...(itemData.name !== undefined ? { title: itemData.name } : {}),
-          ...(itemData.barcodes !== undefined ? { barcodes: itemData.barcodes } : {}),
-          ...(itemData.defaultExpiry !== undefined ? (
-            itemData.defaultExpiry ? {
-              defaultExpiryUnit: itemData.defaultExpiry.unit.toUpperCase(),
-              defaultExpiryValue: itemData.defaultExpiry.value,
-            } : {
-              defaultExpiryUnit: null,
-              defaultExpiryValue: null,
-            }
-          ) : {}),
+          ...(itemData.name !== undefined ? { name: itemData.name } : {}),
+          ...(itemData.barcode !== undefined ? { barcode: itemData.barcode } : {}),
         },
       },
     });
@@ -178,8 +161,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const { data } = await createLocationMutation({
       variables: {
         input: {
-          title: locationData.name,
-          status: 'PUBLISH',
+          name: locationData.name,
+          createdAt: new Date().toISOString(),
         },
       },
     });
@@ -191,7 +174,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       variables: {
         input: {
           id,
-          ...(locationData.name !== undefined ? { title: locationData.name } : {}),
+          ...(locationData.name !== undefined ? { name: locationData.name } : {}),
         },
       },
     });
@@ -204,15 +187,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getLocation = (id: string) => locations.find((location) => location.id === id);
 
   const addInventory = async (inventoryData: Omit<Inventory, 'id' | 'createdAt'>): Promise<Inventory> => {
+    const item = getItem(inventoryData.itemId);
+    const location = getLocation(inventoryData.locationId);
     const { data } = await createInventoryMutation({
       variables: {
         input: {
-          title: 'Inventory Entry',
-          status: 'PUBLISH',
-          clogItemId: parseInt(inventoryData.itemId, 10),
-          clogLocationId: parseInt(inventoryData.locationId, 10),
+          // No trigger derives this server-side (see wp clog seed's convention in
+          // server/includes/seed-data.php) — it is what the admin list shows.
+          name: `${item?.name ?? 'Unknown'} @ ${location?.name ?? 'Unknown'}`,
+          createdAt: new Date().toISOString(),
           dateAdded: inventoryData.dateAdded.toISOString(),
-          dateExpiry: inventoryData.dateExpiry?.toISOString() ?? null,
+          item: inventoryData.itemId,
+          location: inventoryData.locationId,
         },
       },
     });
@@ -224,9 +210,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       variables: {
         input: {
           id,
-          ...(inventoryData.dateExpiry !== undefined ? {
-            dateExpiry: inventoryData.dateExpiry?.toISOString() ?? null,
-          } : {}),
+          ...(inventoryData.dateAdded !== undefined ? { dateAdded: inventoryData.dateAdded.toISOString() } : {}),
         },
       },
     });

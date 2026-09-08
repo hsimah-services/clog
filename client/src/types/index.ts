@@ -1,13 +1,7 @@
-export interface DefaultExpiry {
-  unit: 'days' | 'months';
-  value: number;
-}
-
 export interface Item {
   id: string;
   name: string;
-  barcodes: string[];
-  defaultExpiry: DefaultExpiry | null;
+  barcode: string | null;
   createdAt: Date;
 }
 
@@ -22,6 +16,5 @@ export interface Inventory {
   itemId: string;
   locationId: string;
   dateAdded: Date;
-  dateExpiry: Date | null;
   createdAt: Date;
 }

@@ -1,0 +1,29 @@
+{
+    "name": "hsimah/clog",
+    "description": "Clog (Cave Log) — WordPress plugin: inventory post types exposed via WPGraphQL.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "elephentity/elephentity": "^0.1.0"
+    },
+    "require-dev": {
+        "elephentity/codegen": "^0.1.0",
+        "elephentity/codegen-php": "^0.1.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "platform": {
+            "php": "8.3.31"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Clog\\Entity\\": "generated/",
+            "Clog\\Type\\": "src/Type/",
+            "Clog\\": "src/"
+        }
+    }
+}

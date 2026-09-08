@@ -2,19 +2,31 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Docker Compose Up",
+      "label": "Clog: Start dev stack",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/check-docker.sh",
+      "command": "${workspaceFolder}/scripts/dev.sh up",
       "isBackground": true,
       "problemMatcher": [],
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "runOptions": { "runOn": "folderOpen" }
     },
     {
-      "label": "Docker Compose Down",
+      "label": "Clog: Stop dev stack",
       "type": "shell",
-      "command": "docker compose down",
+      "command": "${workspaceFolder}/scripts/dev.sh down",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clog: Tail WordPress logs",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/dev.sh logs wordpress",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Clog: Reset database (destructive)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/dev.sh reset",
       "problemMatcher": []
     }
   ]

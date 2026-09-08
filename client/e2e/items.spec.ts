@@ -45,23 +45,19 @@ test.describe('Items', () => {
     await expect(page.getByRole('heading', { name: 'Canned Beans' })).toBeVisible();
   });
 
-  test('creates a new item with barcode and default expiry', async ({ page, waitForData, authenticate }) => {
+  test('creates a new item with a barcode', async ({ page, waitForData, authenticate }) => {
     await authenticate();
     await page.goto('/clog/items/new');
     await waitForData(page);
 
     await page.getByLabel('Name').fill('Milk');
-    await page.getByRole('button', { name: 'Set manually' }).click();
-    await page.getByPlaceholder('Enter barcode').first().fill('1234567890');
-
-    // Set default expiry
-    await page.getByPlaceholder('e.g. 6').fill('14');
-    await page.locator('select').first().selectOption('days');
+    await page.getByPlaceholder('Enter barcode').fill('1234567890');
 
     await page.getByRole('button', { name: 'Create' }).click();
 
     await expect(page).toHaveURL(/\/clog\/items\/\d+$/);
     await expect(page.getByRole('heading', { name: 'Milk' })).toBeVisible();
+    await expect(page.getByRole('complementary').getByText('1234567890')).toBeVisible();
   });
 
   test('navigates to item detail page', async ({ page, waitForData, authenticate }) => {

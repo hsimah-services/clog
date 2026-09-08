@@ -76,8 +76,11 @@ function clog_get_vite_assets() {
 function clog_activate() {
 	clog_rewrite_rules();
 	flush_rewrite_rules();
-	clog_get_snapshot_dir();
-	clog_schedule_snapshot_events();
+	clog_clear_legacy_snapshot_events();
+
+	// The entity tables are the storage; without them every resolver hits a table
+	// that is not there. Creation only — an existing table is left alone.
+	clog_install_tables();
 }
 
 /**
@@ -85,5 +88,18 @@ function clog_activate() {
  */
 function clog_deactivate() {
 	flush_rewrite_rules();
-	clog_unschedule_snapshot_events();
+	clog_clear_legacy_snapshot_events();
+}
+
+/**
+ * Drop cron events left behind by the removed snapshot feature.
+ *
+ * Deleting the handlers does not unschedule anything: WP would keep firing
+ * these hooks forever, find nothing hooked to them, and silently do nothing.
+ * Removable once no install has run a version that scheduled them.
+ */
+function clog_clear_legacy_snapshot_events(): void {
+	foreach ( [ 'clog_daily_snapshot', 'clog_weekly_snapshot', 'clog_monthly_snapshot' ] as $hook ) {
+		wp_clear_scheduled_hook( $hook );
+	}
 }

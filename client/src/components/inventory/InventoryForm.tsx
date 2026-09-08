@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/Label';
 import { Select } from '@/components/ui/Select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useData } from '@/context/DataContext';
-import { calcExpiryDate } from '@/lib/utils';
 import type { Inventory } from '@/types';
 
 interface InventoryFormProps {
@@ -21,23 +20,10 @@ function toDateInputValue(date: Date): string {
 
 export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
   const navigate = useNavigate();
-  const { items, locations, addInventory, updateInventory, getItem } = useData();
+  const { items, locations, addInventory, updateInventory } = useData();
   const [itemId, setItemId] = useState(inventory?.itemId ?? '');
   const [locationId, setLocationId] = useState(inventory?.locationId ?? '');
-  const [dateAdded] = useState(toDateInputValue(inventory?.dateAdded ?? new Date()));
-  const [dateExpiry, setDateExpiry] = useState(
-    inventory?.dateExpiry ? toDateInputValue(inventory.dateExpiry) : ''
-  );
-
-  const handleItemChange = (newItemId: string) => {
-    setItemId(newItemId);
-    const item = getItem(newItemId);
-    if (item?.defaultExpiry) {
-      setDateExpiry(toDateInputValue(calcExpiryDate(item.defaultExpiry)));
-    } else {
-      setDateExpiry('');
-    }
-  };
+  const [dateAdded, setDateAdded] = useState(toDateInputValue(inventory?.dateAdded ?? new Date()));
 
   const isEditing = !!inventory;
 
@@ -45,17 +31,15 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
     e.preventDefault();
     if (isEditing) {
       await updateInventory(inventory.id, {
-        dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
+        dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
       });
       navigate(`/inventory/${inventory.id}`);
     } else {
-      const data = {
+      const newInventory = await addInventory({
         itemId,
         locationId,
         dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
-        dateExpiry: dateExpiry ? new Date(dateExpiry + 'T00:00:00.000Z') : null,
-      };
-      const newInventory = await addInventory(data);
+      });
       navigate(`/inventory/${newInventory.id}`);
     }
   };
@@ -75,7 +59,7 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
               <Select
                 id="item"
                 value={itemId}
-                onChange={(e) => handleItemChange(e.target.value)}
+                onChange={(e) => setItemId(e.target.value)}
                 required
                 disabled={isEditing}
               >
@@ -110,16 +94,8 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
                 id="dateAdded"
                 type="date"
                 value={dateAdded}
-                readOnly
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateExpiry">Expiry Date (optional)</Label>
-              <Input
-                id="dateExpiry"
-                type="date"
-                value={dateExpiry}
-                onChange={(e) => setDateExpiry(e.target.value)}
+                onChange={(e) => setDateAdded(e.target.value)}
+                readOnly={!isEditing}
               />
             </div>
             <div className="flex gap-2">

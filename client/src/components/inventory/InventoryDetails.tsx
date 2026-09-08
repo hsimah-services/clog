@@ -43,10 +43,6 @@ export function InventoryDetails({ inventory }: InventoryDetailsProps) {
             <p>{inventory.dateAdded.toLocaleDateString()}</p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Expiry Date</p>
-            <p>{inventory.dateExpiry ? inventory.dateExpiry.toLocaleDateString() : 'No expiry'}</p>
-          </div>
-          <div>
             <p className="text-sm text-muted-foreground">Created</p>
             <p>{inventory.createdAt.toLocaleDateString()}</p>
           </div>
